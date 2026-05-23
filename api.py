@@ -113,7 +113,7 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)
 # ── CORS — restricted to known origins ────────────────────────────────────────
 _CORS_ORIGINS = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:8501,http://localhost:3000,http://localhost:8000",
+    "http://localhost:8501,http://localhost:3000,http://localhost:8000,http://localhost:8080",
 )
 app.add_middleware(
     CORSMiddleware,
