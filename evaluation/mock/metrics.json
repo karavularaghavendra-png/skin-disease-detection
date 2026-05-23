@@ -1,0 +1,45 @@
+{
+    "Acne": {
+        "precision": 0.925531914893617,
+        "recall": 0.87,
+        "f1-score": 0.8969072164948454,
+        "support": 100.0
+    },
+    "Eczema": {
+        "precision": 0.8703703703703703,
+        "recall": 0.94,
+        "f1-score": 0.9038461538461539,
+        "support": 100.0
+    },
+    "Fungal": {
+        "precision": 0.9052631578947369,
+        "recall": 0.86,
+        "f1-score": 0.882051282051282,
+        "support": 100.0
+    },
+    "Normal": {
+        "precision": 0.8877551020408163,
+        "recall": 0.87,
+        "f1-score": 0.8787878787878788,
+        "support": 100.0
+    },
+    "Psoriasis": {
+        "precision": 0.8857142857142857,
+        "recall": 0.93,
+        "f1-score": 0.9073170731707317,
+        "support": 100.0
+    },
+    "accuracy": 0.894,
+    "macro avg": {
+        "precision": 0.8949269661827653,
+        "recall": 0.8939999999999999,
+        "f1-score": 0.8937819208701784,
+        "support": 500.0
+    },
+    "weighted avg": {
+        "precision": 0.8949269661827652,
+        "recall": 0.894,
+        "f1-score": 0.8937819208701784,
+        "support": 500.0
+    }
+}

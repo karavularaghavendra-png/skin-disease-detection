@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+raw_images/
+logs/
+.env
+*.egg-info
+dist/
+build/
+webapp_archive/

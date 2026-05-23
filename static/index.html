@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Disease Detection Using Deep Learning</title>
+<meta name="description" content="AI-powered skin disease detection using deep learning. Upload a skin image for instant analysis with condition identification, severity assessment, and care recommendations.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5fdf6;
+    --bg2: #e8f5e9;
+    --bg3: #c8e6c9;
+    --accent: #4CAF50;
+    --accent2: #66BB6A;
+    --accent3: #2E7D32;
+    --accent-light: rgba(76,175,80,0.08);
+    --accent-light2: rgba(76,175,80,0.14);
+    --glass: rgba(255,255,255,0.88);
+    --glass2: rgba(255,255,255,0.72);
+    --border: rgba(76,175,80,0.15);
+    --border2: rgba(76,175,80,0.25);
+    --text: #1B5E20;
+    --text2: #33691E;
+    --text3: #689F38;
+    --shadow: rgba(76,175,80,0.06);
+    --shadow2: rgba(76,175,80,0.12);
+    --red: #dc4747;
+    --orange: #e08329;
+    --yellow: #c09a15;
+    --green-soft: #e8f5e9;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background-image: linear-gradient(135deg, #f5fdf6 0%, #ffffff 50%, #e8f5e9 100%);
+  }
+
+  /* ── Soft ambient orbs ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: 0;
+    animation: orb-drift 14s ease-in-out infinite alternate;
+  }
+  .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(76,175,80,0.12),transparent 70%);top:-150px;left:-150px;animation-delay:0s}
+  .orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(129,199,132,0.10),transparent 70%);bottom:-120px;right:-100px;animation-delay:-5s}
+  .orb3{width:350px;height:350px;background:radial-gradient(circle,rgba(200,230,201,0.15),transparent 70%);top:35%;left:55%;animation-delay:-3s}
+
+  @keyframes orb-drift {
+    from{transform:translate(0,0) scale(1)}
+    to{transform:translate(25px,-18px) scale(1.06)}
+  }
+
+  /* ── Subtle dot grid ── */
+  body::before {
+    content:'';position:fixed;inset:0;z-index:0;
+    background-image:
+      radial-gradient(circle, rgba(76,175,80,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events:none;
+  }
+
+  /* ── Layout ── */
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* ── Nav ── */
+  nav {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 0;border-bottom:1px solid var(--border);
+  }
+  .logo {
+    font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
+    display:flex;align-items:center;gap:10px;letter-spacing:-0.5px;
+    color:var(--text);
+  }
+  .logo-dot {
+    width:10px;height:10px;background:var(--accent);
+    border-radius:50%;box-shadow:0 0 8px rgba(42,157,92,0.4),0 0 16px rgba(42,157,92,0.2);
+    animation:pulse-dot 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:0.7}}
+
+  .nav-badge {
+    font-size:12px;font-weight:500;padding:5px 14px;
+    background:var(--glass);border:1px solid var(--border2);
+    border-radius:99px;color:var(--accent3);
+    backdrop-filter:blur(10px);letter-spacing:0.5px;
+  }
+
+  /* ── Hero ── */
+  .hero{padding:72px 0 52px;text-align:center}
+  .hero-eyebrow {
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:500;letter-spacing:1.5px;
+    color:var(--accent);text-transform:uppercase;
+    background:var(--accent-light);border:1px solid var(--border);
+    padding:7px 18px;border-radius:99px;margin-bottom:28px;
+    backdrop-filter:blur(8px);
+  }
+  .hero h1 {
+    font-family:'Syne',sans-serif;
+    font-size:clamp(34px,5.5vw,66px);
+    font-weight:800;line-height:1.08;
+    letter-spacing:-1.5px;margin-bottom:20px;
+    color:var(--text);
+  }
+  .hero h1 span {
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .hero p {
+    font-size:17px;font-weight:300;color:var(--text2);
+    max-width:540px;margin:0 auto 44px;line-height:1.7;
+  }
+
+  /* ── Cards ── */
+  .upload-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+  @media(max-width:700px){.upload-section{grid-template-columns:1fr}}
+
+  .card-3d {
+    background:var(--glass);
+    border:1px solid var(--border);
+    border-radius:22px;
+    backdrop-filter:blur(16px);
+    padding:30px;
+    position:relative;
+    overflow:hidden;
+    transition:transform 0.3s ease,box-shadow 0.3s ease;
+    box-shadow:0 4px 20px var(--shadow);
+  }
+  .card-3d:hover {
+    transform:translateY(-3px);
+    box-shadow:0 12px 40px var(--shadow2),0 0 0 1px var(--border2);
+  }
+
+  .card-shine {
+    position:absolute;inset:0;border-radius:22px;
+    background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 50%);
+    pointer-events:none;
+  }
+
+  /* ── Drop Zone ── */
+  .drop-zone {
+    border:2px dashed var(--border2);
+    border-radius:16px;padding:44px 24px;
+    text-align:center;cursor:pointer;
+    transition:all 0.3s ease;position:relative;
+    background:var(--accent-light);
+  }
+  .drop-zone:hover,.drop-zone.dragover {
+    border-color:var(--accent);
+    background:var(--accent-light2);
+    box-shadow:inset 0 0 20px rgba(42,157,92,0.04);
+  }
+  .drop-icon {
+    width:60px;height:60px;margin:0 auto 14px;
+    background:linear-gradient(135deg,rgba(42,157,92,0.15),rgba(52,184,106,0.08));
+    border:1px solid var(--border2);border-radius:16px;
+    display:flex;align-items:center;justify-content:center;font-size:26px;
+    box-shadow:0 4px 16px rgba(42,157,92,0.10);
+    transition:transform 0.3s ease;
+  }
+  .drop-zone:hover .drop-icon{transform:scale(1.08) translateY(-2px)}
+  .drop-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)}
+  .drop-sub{font-size:13px;color:var(--text3)}
+
+  #file-input{display:none}
+  #preview-img {
+    width:100%;border-radius:12px;object-fit:cover;
+    max-height:220px;display:none;
+    box-shadow:0 6px 24px var(--shadow2);
+  }
+
+  /* ── Analyze Button ── */
+  .btn-analyze {
+    width:100%;margin-top:18px;
+    padding:15px;border:none;border-radius:14px;cursor:pointer;
+    font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+    letter-spacing:0.3px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;position:relative;overflow:hidden;
+    transition:all 0.3s ease;
+    box-shadow:0 6px 20px rgba(42,157,92,0.25);
+  }
+  .btn-analyze::before {
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);
+    opacity:0;transition:opacity 0.3s ease;
+  }
+  .btn-analyze:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(42,157,92,0.30)}
+  .btn-analyze:hover::before{opacity:1}
+  .btn-analyze:active{transform:translateY(0)}
+  .btn-analyze:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+
+  /* ── Result Panel ── */
+  .result-card {
+    background:var(--glass2);
+    border:1px solid var(--border);
+    border-radius:22px;backdrop-filter:blur(16px);
+    padding:30px;min-height:320px;
+    display:flex;flex-direction:column;
+    position:relative;overflow:hidden;
+    box-shadow:0 4px 20px var(--shadow);
+  }
+  .result-card::after {
+    content:'';position:absolute;
+    bottom:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    opacity:0;transition:opacity 0.5s ease;
+  }
+  .result-card.loaded::after{opacity:1}
+
+  .result-idle {
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    color:var(--text3);
+  }
+  .idle-icon {
+    font-size:44px;margin-bottom:14px;opacity:0.5;
+    animation:float-idle 3s ease-in-out infinite;
+  }
+  @keyframes float-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+  /* ── Diagnosis Output ── */
+  #diagnosis-output{display:none}
+  .diag-badge {
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;
+    letter-spacing:0.5px;margin-bottom:18px;
+    background:var(--green-soft);border:1px solid var(--border2);color:var(--accent3);
+  }
+  .diag-condition {
+    font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+    letter-spacing:-0.5px;margin-bottom:4px;
+    color:var(--text);
+  }
+  .diag-confidence {
+    font-size:13px;color:var(--text3);margin-bottom:18px;
+  }
+
+  /* ── Confidence Bar ── */
+  .conf-bar-wrap{margin-bottom:22px}
+  .conf-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:var(--text2)}
+  .conf-bar{height:6px;background:rgba(42,157,92,0.08);border-radius:99px;overflow:hidden}
+  .conf-fill {
+    height:100%;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    box-shadow:0 0 8px rgba(42,157,92,0.3);
+    width:0%;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* ── Description ── */
+  .diag-desc {
+    font-size:13px;line-height:1.8;color:var(--text2);
+    padding:14px 16px;background:var(--green-soft);
+    border-radius:12px;border-left:3px solid var(--accent);
+    margin-bottom:18px;
+  }
+
+  /* ── Severity Tags ── */
+  .severity-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .severity-tag {
+    font-size:11px;font-weight:500;padding:4px 11px;border-radius:99px;
+    border:1px solid;
+  }
+  .sev-low{background:rgba(42,157,92,0.08);color:#1e7a45;border-color:rgba(42,157,92,0.2)}
+  .sev-med{background:rgba(192,154,21,0.08);color:#8a6f0a;border-color:rgba(192,154,21,0.2)}
+  .sev-high{background:rgba(220,71,71,0.08);color:#b93030;border-color:rgba(220,71,71,0.2)}
+  .sev-neutral{background:rgba(122,148,134,0.08);color:#5a7366;border-color:rgba(122,148,134,0.18)}
+
+  /* ── Next Steps ── */
+  .steps-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent3)}
+  .step-item {
+    display:flex;align-items:flex-start;gap:10px;
+    font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6;
+  }
+  .step-num {
+    min-width:20px;height:20px;border-radius:50%;
+    background:var(--green-soft);border:1px solid var(--border2);
+    color:var(--accent);font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+  }
+
+  /* ── Loading Spinner ── */
+  #loading-state{display:none;text-align:center;padding:44px 0}
+  .spinner-ring {
+    width:56px;height:56px;margin:0 auto 18px;
+    border:2px solid rgba(42,157,92,0.12);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text2)}
+  .loading-sub{font-size:12px;color:var(--text3);margin-top:5px}
+
+  /* ── Stats Row ── */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+  @media(max-width:600px){.stats-row{grid-template-columns:1fr}}
+  .stat-card {
+    background:var(--glass);border:1px solid var(--border);
+    border-radius:16px;backdrop-filter:blur(12px);
+    padding:22px 18px;text-align:center;
+    position:relative;overflow:hidden;
+    transition:transform 0.3s ease;
+    box-shadow:0 2px 12px var(--shadow);
+  }
+  .stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--shadow2)}
+  .stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--accent);line-height:1}
+  .stat-label{font-size:11px;font-weight:400;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:1px}
+
+  /* ── Diseases Supported ── */
+  .diseases-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:52px}
+  .disease-pill {
+    font-size:13px;font-weight:500;padding:8px 18px;
+    border-radius:99px;background:var(--glass);
+    border:1px solid var(--border);backdrop-filter:blur(8px);
+    color:var(--text2);transition:all 0.2s ease;cursor:default;
+    display:flex;align-items:center;gap:8px;
+    box-shadow:0 1px 6px var(--shadow);
+  }
+  .disease-pill:hover{background:var(--green-soft);border-color:var(--accent);color:var(--accent3)}
+  .disease-pill span{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0.6;flex-shrink:0}
+
+  /* ── Disclaimer ── */
+  .disclaimer {
+    text-align:center;font-size:11px;color:var(--text3);
+    padding:16px;border-top:1px solid var(--border);margin-top:24px;line-height:1.7;
+  }
+
+  /* ── Fade animations ── */
+  .fade-in{animation:fadeIn 0.6s ease forwards}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── Error ── */
+  .error-msg {
+    background:rgba(220,71,71,0.06);border:1px solid rgba(220,71,71,0.18);
+    border-radius:12px;padding:12px 14px;font-size:12px;color:#b93030;margin-top:12px;display:none;
+  }
+
+  /* ── Symptoms list ── */
+  .symptoms-section{margin-bottom:18px}
+  .symptoms-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent3)}
+  .symptom-item {
+    display:flex;align-items:center;gap:8px;
+    font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.5;
+  }
+  .symptom-dot {
+    width:4px;height:4px;border-radius:50%;
+    background:var(--accent);opacity:0.5;flex-shrink:0;
+  }
+
+  /* ── Quality warnings ── */
+  .quality-warnings {
+    background:rgba(192,154,21,0.06);border:1px solid rgba(192,154,21,0.15);
+    border-radius:10px;padding:10px 14px;margin-bottom:14px;
+    font-size:11px;color:#8a6f0a;
+  }
+  .quality-warnings div{margin-bottom:3px}
+  .quality-warnings div:last-child{margin-bottom:0}
+
+  /* ── Top predictions bar ── */
+  .top-preds{margin-bottom:18px}
+  .top-preds-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent3)}
+  .pred-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+  .pred-name{font-size:11px;color:var(--text2);min-width:80px;text-transform:capitalize}
+  .pred-bar-bg{flex:1;height:5px;background:rgba(42,157,92,0.06);border-radius:99px;overflow:hidden}
+  .pred-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(42,157,92,0.5),rgba(52,184,106,0.3));transition:width 1s ease}
+  .pred-pct{font-size:10px;color:var(--text3);min-width:40px;text-align:right}
+
+  /* ── Section titles ── */
+  .section-title {
+    font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+    margin-bottom:18px;color:var(--accent3);
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="wrap">
+
+  <!-- Nav -->
+  <nav>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      Skin Disease Detection Using Deep Learning
+    </div>
+    <div class="nav-badge">Deep Learning Powered</div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span>◆</span> MobileNetV2 Vision Model
+    </div>
+    <h1>Detect. Diagnose.<br><span>Understand.</span></h1>
+    <p>Upload a skin image and receive instant AI-powered analysis with condition identification, severity assessment, and care recommendations — powered by deep learning.</p>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card" id="stat-confidence">
+      <div class="stat-num">~90%</div>
+      <div class="stat-label">Model Accuracy</div>
+    </div>
+    <div class="stat-card" id="stat-conditions">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Conditions Detected</div>
+    </div>
+    <div class="stat-card" id="stat-speed">
+      <div class="stat-num">&lt;3s</div>
+      <div class="stat-label">Analysis Time</div>
+    </div>
+  </div>
+
+  <!-- Supported Conditions -->
+  <div class="diseases-row">
+    <div class="disease-pill"><span></span>Acne</div>
+    <div class="disease-pill"><span></span>Eczema</div>
+    <div class="disease-pill"><span></span>Fungal Infection</div>
+    <div class="disease-pill"><span></span>Psoriasis</div>
+    <div class="disease-pill"><span></span>Normal Skin</div>
+  </div>
+
+  <!-- Upload + Result -->
+  <div class="upload-section">
+
+    <!-- Upload Card -->
+    <div class="card-3d" id="upload-card">
+      <div class="card-shine"></div>
+      <div class="section-title">Upload Image</div>
+
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="image/*">
+        <img id="preview-img" alt="Preview">
+        <div id="drop-content">
+          <div class="drop-icon">🔬</div>
+          <div class="drop-title">Drop your skin image</div>
+          <div class="drop-sub">PNG, JPG, WEBP · Max 10MB</div>
+        </div>
+      </div>
+
+      <button class="btn-analyze" id="analyze-btn" disabled onclick="analyzeImage()">
+        ✦ Analyze Skin Condition
+      </button>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card-3d result-card" id="result-card">
+      <div class="card-shine"></div>
+
+      <!-- Idle state -->
+      <div class="result-idle" id="idle-state">
+        <div class="idle-icon">🌿</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text)">Awaiting Analysis</div>
+        <div style="font-size:13px">Upload an image to receive your AI diagnosis report</div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading-state">
+        <div class="spinner-ring"></div>
+        <div class="loading-text">Analyzing with 8-pass TTA…</div>
+        <div class="loading-sub">Running MobileNetV2 × 8 augmented views</div>
+      </div>
+
+      <!-- Diagnosis output -->
+      <div id="diagnosis-output" class="fade-in">
+        <div class="diag-badge" id="d-badge">✦ Diagnosis Complete</div>
+        <div class="diag-condition" id="d-condition"></div>
+        <div class="diag-confidence" id="d-conf"></div>
+
+        <div class="conf-bar-wrap">
+          <div class="conf-label"><span>Confidence Score</span><span id="d-conf-pct">—</span></div>
+          <div class="conf-bar"><div class="conf-fill" id="conf-fill"></div></div>
+        </div>
+
+        <!-- TTA metrics row -->
+        <div id="d-tta-metrics" style="display:none;margin:10px 0 6px;padding:10px 14px;background:rgba(42,157,92,0.06);border:1px solid rgba(42,157,92,0.15);border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--text)">
+            <span>🔄 <strong>TTA</strong> <span id="d-tta-passes">8</span> passes</span>
+            <span>🎯 Agreement: <strong id="d-tta-agree">—</strong></span>
+            <span>⚡ <span id="d-tta-latency">—</span></span>
+          </div>
+        </div>
+
+        <!-- Quality warnings -->
+        <div class="quality-warnings" id="d-quality" style="display:none"></div>
+
+        <div class="diag-desc" id="d-desc"></div>
+
+        <div class="severity-row" id="d-tags"></div>
+
+        <!-- Symptoms -->
+        <div class="symptoms-section" id="d-symptoms-section" style="display:none">
+          <div class="symptoms-title">Common Symptoms</div>
+          <div id="d-symptoms"></div>
+        </div>
+
+        <!-- Top predictions -->
+        <div class="top-preds" id="d-top-preds" style="display:none">
+          <div class="top-preds-title">Top Predictions</div>
+          <div id="d-preds-list"></div>
+        </div>
+
+        <div class="steps-title">Recommended Next Steps</div>
+        <div id="d-steps"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    ⚠️ This system is for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.<br>
+    Always consult a certified dermatologist for clinical evaluation and treatment.
+  </div>
+
+</div>
+
+<script>
+/* ── DOM References ── */
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const previewImg = document.getElementById('preview-img');
+const dropContent = document.getElementById('drop-content');
+const analyzeBtn = document.getElementById('analyze-btn');
+const errorMsg = document.getElementById('error-msg');
+
+let selectedFile = null;
+
+/* ── File Handling ── */
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    showError('Please upload a valid image file.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showError('File too large. Maximum size is 10 MB.');
+    return;
+  }
+  selectedFile = file;
+  hideError();
+  const reader = new FileReader();
+  reader.onload = ev => {
+    previewImg.src = ev.target.result;
+    previewImg.style.display = 'block';
+    dropContent.style.display = 'none';
+    analyzeBtn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showError(msg) { errorMsg.textContent = msg; errorMsg.style.display = 'block'; }
+function hideError() { errorMsg.style.display = 'none'; }
+
+function setState(state) {
+  document.getElementById('idle-state').style.display = state === 'idle' ? 'flex' : 'none';
+  document.getElementById('loading-state').style.display = state === 'loading' ? 'block' : 'none';
+  document.getElementById('diagnosis-output').style.display = state === 'result' ? 'block' : 'none';
+}
+
+/* ── Analyze — calls local FastAPI backend ── */
+async function analyzeImage() {
+  if (!selectedFile) return;
+  analyzeBtn.disabled = true;
+  hideError();
+  setState('loading');
+  document.getElementById('result-card').classList.remove('loaded');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    const response = await fetch('/predict/web', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server error (${response.status})`);
+    }
+
+    const result = await response.json();
+    renderResult(result);
+  } catch (err) {
+    setState('idle');
+    showError(err.message || 'Analysis failed. Please try again with a clearer image.');
+    console.error(err);
+  } finally {
+    analyzeBtn.disabled = false;
+  }
+}
+
+/* ── Render Result ── */
+function renderResult(r) {
+  setState('result');
+  document.getElementById('result-card').classList.add('loaded');
+
+  const condition = r.display_name || r.disease || 'Unknown';
+  const confidence = Math.round((r.confidence || 0) * 100);
+  const description = r.description || '';
+  const severity = r.severity || 'Unknown';
+  const symptoms = r.symptoms || [];
+  const recommendations = r.recommendations || [];
+  const qualityWarnings = r.quality_warnings || [];
+  const topPredictions = r.top_predictions || [];
+  const isReliable = r.is_reliable !== false;
+  const entropy = r.prediction_entropy || 0;
+  const margin = r.prediction_margin || 100;
+  const ttaUsed = r.tta_used || false;
+  const ttaPasses = r.tta_passes || 0;
+  const ttaAgreement = r.tta_agreement || 0;
+  const ttaLatency = r.latency_ms || 0;
+
+  document.getElementById('d-condition').textContent = condition;
+  document.getElementById('d-desc').textContent = description;
+
+  /* TTA metrics bar */
+  const ttaMetrics = document.getElementById('d-tta-metrics');
+  if (ttaUsed && ttaMetrics) {
+    document.getElementById('d-tta-passes').textContent = ttaPasses;
+    document.getElementById('d-tta-agree').textContent = ttaAgreement + '%';
+    document.getElementById('d-tta-latency').textContent = ttaLatency + 'ms';
+    ttaMetrics.style.display = 'block';
+    // Color the agreement based on value
+    const agreeEl = document.getElementById('d-tta-agree');
+    agreeEl.style.color = ttaAgreement >= 87.5 ? '#2a9d5c' : ttaAgreement >= 50 ? '#c09a15' : '#dc4747';
+  } else if (ttaMetrics) {
+    ttaMetrics.style.display = 'none';
+  }
+
+  /* Confidence text — adapts to reliability */
+  const confLabel = document.getElementById('d-conf');
+  const confPct = document.getElementById('d-conf-pct');
+  if (isReliable) {
+    confLabel.textContent = `Identified with ${confidence}% confidence`;
+    confPct.textContent = `${confidence}%`;
+  } else {
+    confLabel.textContent = `⚠️ Low reliability — ${confidence}% confidence`;
+    confLabel.style.color = '#dc4747';
+    confPct.textContent = `${confidence}%`;
+  }
+
+  /* Confidence bar — color reflects reliability */
+  setTimeout(() => {
+    const fill = document.getElementById('conf-fill');
+    fill.style.width = confidence + '%';
+    if (!isReliable) {
+      fill.style.background = 'linear-gradient(90deg,#dc4747,#e06060)';
+    } else if (confidence >= 80) {
+      fill.style.background = 'linear-gradient(90deg,#2a9d5c,#34b86a)';
+    } else if (confidence >= 60) {
+      fill.style.background = 'linear-gradient(90deg,#c09a15,#d4ad1a)';
+    } else {
+      fill.style.background = 'linear-gradient(90deg,#dc4747,#e06060)';
+    }
+  }, 100);
+
+  /* Reliability banner — shown when prediction is unreliable */
+  const qualityEl = document.getElementById('d-quality');
+  if (!isReliable || qualityWarnings.length > 0) {
+    let html = '';
+
+    if (!isReliable) {
+      html += `<div style="padding:12px 16px;background:linear-gradient(135deg,#fef3cd,#fff3e0);border:1px solid #f0c040;border-radius:10px;margin-bottom:8px;font-weight:600;color:#856404">
+        🛡️ <strong>Reliability Alert:</strong> This prediction may not be accurate.
+        The model shows ${confidence < 65 ? 'low confidence' : margin < 15 ? 'ambiguity between conditions' : 'high uncertainty'}.
+        Please consult a dermatologist for a professional diagnosis.
+      </div>`;
+    }
+
+    qualityWarnings.forEach(w => {
+      html += `<div style="padding:8px 12px;background:#fff8e1;border-left:3px solid #f0c040;border-radius:6px;margin-bottom:6px;color:#6b5900;font-size:0.92rem">⚠️ ${w}</div>`;
+    });
+
+    qualityEl.innerHTML = html;
+    qualityEl.style.display = 'block';
+  } else {
+    qualityEl.style.display = 'none';
+  }
+
+  /* Severity tags */
+  const tagsEl = document.getElementById('d-tags');
+  tagsEl.innerHTML = '';
+  const sevMap = {
+    'Low / Mild — Routine Care': 'sev-low',
+    'Moderate — Monitor Closely': 'sev-med',
+    'High Priority — Seek Medical Advice': 'sev-high',
+    'Not Applicable': 'sev-low',
+  };
+  const sevClass = sevMap[severity] || 'sev-neutral';
+  const sevShort = severity.includes('—') ? severity.split('—')[0].trim() : severity;
+  tagsEl.innerHTML += `<span class="severity-tag ${sevClass}">⬤ ${sevShort}</span>`;
+
+  if (r.specialist) {
+    tagsEl.innerHTML += `<span class="severity-tag sev-neutral">👨‍⚕️ ${r.specialist}</span>`;
+  }
+
+  /* Reliability badge */
+  if (isReliable) {
+    tagsEl.innerHTML += `<span class="severity-tag sev-low">✅ Reliable</span>`;
+  } else {
+    tagsEl.innerHTML += `<span class="severity-tag sev-high">⚠️ Uncertain</span>`;
+  }
+
+  /* Symptoms */
+  const symptomsSection = document.getElementById('d-symptoms-section');
+  const symptomsEl = document.getElementById('d-symptoms');
+  if (symptoms.length > 0) {
+    symptomsEl.innerHTML = symptoms.map(s =>
+      `<div class="symptom-item"><div class="symptom-dot"></div><div>${s}</div></div>`
+    ).join('');
+    symptomsSection.style.display = 'block';
+  } else {
+    symptomsSection.style.display = 'none';
+  }
+
+  /* Top predictions */
+  const topPredsSection = document.getElementById('d-top-preds');
+  const predsListEl = document.getElementById('d-preds-list');
+  if (topPredictions.length > 1) {
+    predsListEl.innerHTML = '';
+    topPredictions.forEach(p => {
+      const pct = Math.round((p.confidence || 0) * 100);
+      predsListEl.innerHTML += `
+        <div class="pred-row">
+          <div class="pred-name">${p.disease}</div>
+          <div class="pred-bar-bg"><div class="pred-bar-fill" style="width:${pct}%"></div></div>
+          <div class="pred-pct">${pct}%</div>
+        </div>`;
+    });
+    topPredsSection.style.display = 'block';
+  } else {
+    topPredsSection.style.display = 'none';
+  }
+
+  /* Recommendations as steps */
+  const stepsEl = document.getElementById('d-steps');
+  stepsEl.innerHTML = '';
+  recommendations.forEach((s, i) => {
+    stepsEl.innerHTML += `<div class="step-item"><div class="step-num">${i+1}</div><div>${s}</div></div>`;
+  });
+}
+</script>
+</body>
+</html>

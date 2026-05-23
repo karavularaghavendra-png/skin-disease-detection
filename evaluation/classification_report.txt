@@ -1,0 +1,14 @@
+Classification Report
+=======================================================
+
+              precision    recall  f1-score   support
+
+        acne       0.88      0.92      0.90       131
+      eczema       0.86      0.86      0.86       139
+      fungal       0.85      0.92      0.88       143
+      normal       1.00      0.99      0.99       138
+   psoriasis       0.90      0.81      0.85       140
+
+    accuracy                           0.90       691
+   macro avg       0.90      0.90      0.90       691
+weighted avg       0.90      0.90      0.90       691

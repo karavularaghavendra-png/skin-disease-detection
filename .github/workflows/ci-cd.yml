@@ -1,0 +1,152 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.12"
+  DOCKER_IMAGE: skin-disease-detector
+
+jobs:
+  # ─── 1. Lint & Format Check ────────────────────────────────────────────────
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install lint tools
+        run: pip install black isort flake8 mypy
+
+      - name: Check formatting (black)
+        run: black --check *.py utils/ tests/
+
+      - name: Check import order (isort)
+        run: isort --check-only *.py utils/ tests/
+
+      - name: Lint (flake8)
+        run: flake8 *.py utils/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+
+      - name: Type check (mypy)
+        run: mypy *.py utils/ --ignore-missing-imports
+
+  # ─── 2. Test Suite ─────────────────────────────────────────────────────────
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio httpx
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ \
+            --cov=predict \
+            --cov=preprocess \
+            --cov=utils \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=70 \
+            -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ─── 3. Security Scan ──────────────────────────────────────────────────────
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install audit tools
+        run: pip install pip-audit bandit
+
+      - name: Audit dependencies for vulnerabilities
+        run: pip-audit -r requirements.txt
+
+      - name: Static security analysis (bandit)
+        run: bandit -r utils/ *.py -ll
+
+  # ─── 4. Docker Build ───────────────────────────────────────────────────────
+  docker:
+    name: Docker Build & Test
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
+
+      - name: Test Docker health check
+        run: |
+          docker run -d --name test-container \
+            -p 8000:8000 \
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          sleep 10
+          curl -f http://localhost:8000/health || exit 1
+          docker stop test-container
+
+  # ─── 5. Deploy (main branch only) ─────────────────────────────────────────
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest \
+            -t ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
+      - name: Notify on success
+        if: success()
+        run: echo "✅ Deployed successfully to production!"

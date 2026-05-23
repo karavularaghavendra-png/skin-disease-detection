@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Model files (too large for git)
+model/*.h5
+model/*.tflite
+*.h5
+*.tflite
+
+# Dataset (too large for git)
+dataset/
+data/
+
+# Raw images (too large for git, share separately)
+raw_images/
+
+# Notebooks with output (large)
+notebooks/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+.pytest_cache/
+
+# Environment
+.env
+
+# Code review graph
+.code-review-graph/
