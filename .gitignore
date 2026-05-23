@@ -12,10 +12,10 @@ venv/
 env/
 .venv/
 
-# Model files (too large for git)
-model/*.h5
+# Model files — .h5 files are now tracked (needed for app to work)
+# model/*.h5  — REMOVED: model must be in repo for portable deployment
 model/*.tflite
-*.h5
+# *.h5  — REMOVED: allow model commit
 *.tflite
 
 # Dataset (too large for git)
@@ -51,3 +51,9 @@ logs/
 
 # Code review graph
 .code-review-graph/
+
+# Portable ZIP (share separately, too large for git)
+*.zip
+
+# BTech report (local only)
+BTech_Report_Structure.txt

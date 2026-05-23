@@ -4,387 +4,848 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skin Disease Detection Using Deep Learning</title>
-<meta name="description" content="AI-powered skin disease detection using deep learning. Upload a skin image for instant analysis with condition identification, severity assessment, and care recommendations.">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<meta name="description" content="AI-powered skin disease detection using deep learning. Upload a skin image for instant analysis with condition identification, severity assessment, care recommendations, and downloadable PDF reports.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script>
+  // Fallback: if jsPDF didn't load from primary CDN, try backup
+  if (!window.jspdf) {
+    var s = document.createElement('script');
+    s.src = 'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js';
+    document.head.appendChild(s);
+  }
+</script>
 <style>
-  :root {
-    --bg: #f5fdf6;
-    --bg2: #e8f5e9;
-    --bg3: #c8e6c9;
-    --accent: #4CAF50;
-    --accent2: #66BB6A;
-    --accent3: #2E7D32;
-    --accent-light: rgba(76,175,80,0.08);
-    --accent-light2: rgba(76,175,80,0.14);
-    --glass: rgba(255,255,255,0.88);
-    --glass2: rgba(255,255,255,0.72);
-    --border: rgba(76,175,80,0.15);
-    --border2: rgba(76,175,80,0.25);
-    --text: #1B5E20;
-    --text2: #33691E;
-    --text3: #689F38;
-    --shadow: rgba(76,175,80,0.06);
-    --shadow2: rgba(76,175,80,0.12);
-    --red: #dc4747;
-    --orange: #e08329;
-    --yellow: #c09a15;
-    --green-soft: #e8f5e9;
-  }
+/* ═══════════════════════════════════════════════════════════════
+   🩺 SKINAI — Light Green Premium Medical Theme
+   Multi-Page SPA · Chart.js · jsPDF · Glassmorphism
+   ═══════════════════════════════════════════════════════════════ */
 
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+:root {
+  --bg: #f5fdf6;
+  --bg2: #e8f5e9;
+  --bg3: #c8e6c9;
+  --accent: #4CAF50;
+  --accent2: #66BB6A;
+  --accent3: #2E7D32;
+  --accent4: #1B5E20;
+  --accent-light: rgba(76,175,80,0.08);
+  --accent-light2: rgba(76,175,80,0.14);
+  --glass: rgba(255,255,255,0.88);
+  --glass2: rgba(255,255,255,0.72);
+  --glass3: rgba(255,255,255,0.55);
+  --border: rgba(76,175,80,0.15);
+  --border2: rgba(76,175,80,0.25);
+  --border3: rgba(76,175,80,0.35);
+  --text: #1B5E20;
+  --text2: #33691E;
+  --text3: #689F38;
+  --text-muted: #7a9a7e;
+  --shadow: rgba(76,175,80,0.06);
+  --shadow2: rgba(76,175,80,0.12);
+  --shadow3: rgba(76,175,80,0.18);
+  --red: #dc4747;
+  --orange: #e08329;
+  --yellow: #c09a15;
+  --green-soft: #e8f5e9;
+  --nav-h: 72px;
+}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    background-image: linear-gradient(135deg, #f5fdf6 0%, #ffffff 50%, #e8f5e9 100%);
-  }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top: var(--nav-h); }
 
-  /* ── Soft ambient orbs ── */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(100px);
-    pointer-events: none;
-    z-index: 0;
-    animation: orb-drift 14s ease-in-out infinite alternate;
-  }
-  .orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(76,175,80,0.12),transparent 70%);top:-150px;left:-150px;animation-delay:0s}
-  .orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(129,199,132,0.10),transparent 70%);bottom:-120px;right:-100px;animation-delay:-5s}
-  .orb3{width:350px;height:350px;background:radial-gradient(circle,rgba(200,230,201,0.15),transparent 70%);top:35%;left:55%;animation-delay:-3s}
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: linear-gradient(135deg, #f5fdf6 0%, #ffffff 50%, #e8f5e9 100%);
+}
 
-  @keyframes orb-drift {
-    from{transform:translate(0,0) scale(1)}
-    to{transform:translate(25px,-18px) scale(1.06)}
-  }
+/* ── Ambient orbs ── */
+.orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(100px); pointer-events: none; z-index: 0;
+  animation: orb-drift 14s ease-in-out infinite alternate;
+}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(76,175,80,0.12),transparent 70%);top:-150px;left:-150px}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(129,199,132,0.10),transparent 70%);bottom:-120px;right:-100px;animation-delay:-5s}
+.orb3{width:350px;height:350px;background:radial-gradient(circle,rgba(200,230,201,0.15),transparent 70%);top:35%;left:55%;animation-delay:-3s}
+.orb4{width:300px;height:300px;background:radial-gradient(circle,rgba(76,175,80,0.08),transparent 70%);top:60%;left:10%;animation-delay:-8s}
 
-  /* ── Subtle dot grid ── */
-  body::before {
-    content:'';position:fixed;inset:0;z-index:0;
-    background-image:
-      radial-gradient(circle, rgba(76,175,80,0.06) 1px, transparent 1px);
-    background-size: 32px 32px;
-    pointer-events:none;
-  }
+@keyframes orb-drift {
+  from{transform:translate(0,0) scale(1)}
+  to{transform:translate(25px,-18px) scale(1.06)}
+}
 
-  /* ── Layout ── */
-  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+/* ── Dot grid ── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0;
+  background-image: radial-gradient(circle, rgba(76,175,80,0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events:none;
+}
 
-  /* ── Nav ── */
-  nav {
-    display:flex;align-items:center;justify-content:space-between;
-    padding:22px 0;border-bottom:1px solid var(--border);
-  }
-  .logo {
-    font-family:'Syne',sans-serif;font-size:20px;font-weight:800;
-    display:flex;align-items:center;gap:10px;letter-spacing:-0.5px;
-    color:var(--text);
-  }
-  .logo-dot {
-    width:10px;height:10px;background:var(--accent);
-    border-radius:50%;box-shadow:0 0 8px rgba(42,157,92,0.4),0 0 16px rgba(42,157,92,0.2);
-    animation:pulse-dot 2.5s ease-in-out infinite;
-  }
-  @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:0.7}}
+/* ── Layout ── */
+.wrap { position:relative; z-index:1; max-width:1160px; margin:0 auto; padding:0 24px; }
 
-  .nav-badge {
-    font-size:12px;font-weight:500;padding:5px 14px;
-    background:var(--glass);border:1px solid var(--border2);
-    border-radius:99px;color:var(--accent3);
-    backdrop-filter:blur(10px);letter-spacing:0.5px;
-  }
+/* ═══════════════════════════════════════════════════════════════
+   NAVBAR — Sticky Glass
+   ═══════════════════════════════════════════════════════════════ */
+.navbar {
+  position: fixed; top:0; left:0; right:0; z-index:1000;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-bottom: 1px solid var(--border);
+  height: var(--nav-h);
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+.navbar.scrolled {
+  box-shadow: 0 4px 30px rgba(76,175,80,0.08);
+  background: rgba(255,255,255,0.92);
+}
+.nav-inner {
+  max-width:1160px; margin:0 auto; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  height:100%;
+}
+.logo {
+  font-family:'Syne',sans-serif; font-size:20px; font-weight:800;
+  display:flex; align-items:center; gap:10px; letter-spacing:-0.5px;
+  color:var(--text); text-decoration:none;
+}
+.logo-dot {
+  width:10px; height:10px; background:var(--accent);
+  border-radius:50%; box-shadow:0 0 8px rgba(42,157,92,0.4),0 0 16px rgba(42,157,92,0.2);
+  animation:pulse-dot 2.5s ease-in-out infinite;
+}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:0.7}}
 
-  /* ── Hero ── */
-  .hero{padding:72px 0 52px;text-align:center}
-  .hero-eyebrow {
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:12px;font-weight:500;letter-spacing:1.5px;
-    color:var(--accent);text-transform:uppercase;
-    background:var(--accent-light);border:1px solid var(--border);
-    padding:7px 18px;border-radius:99px;margin-bottom:28px;
-    backdrop-filter:blur(8px);
-  }
-  .hero h1 {
-    font-family:'Syne',sans-serif;
-    font-size:clamp(34px,5.5vw,66px);
-    font-weight:800;line-height:1.08;
-    letter-spacing:-1.5px;margin-bottom:20px;
-    color:var(--text);
-  }
-  .hero h1 span {
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;
-  }
-  .hero p {
-    font-size:17px;font-weight:300;color:var(--text2);
-    max-width:540px;margin:0 auto 44px;line-height:1.7;
-  }
+.nav-links { display:flex; gap:6px; list-style:none; }
+.nav-links a {
+  font-size:14px; font-weight:500; color:var(--text2);
+  text-decoration:none; padding:8px 16px; border-radius:10px;
+  transition: all 0.25s ease; position:relative;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color:var(--accent3); background:var(--accent-light2);
+}
+.nav-links a.active::after {
+  content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%);
+  width:16px; height:3px; background:var(--accent); border-radius:99px;
+}
 
-  /* ── Cards ── */
-  .upload-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
-  @media(max-width:700px){.upload-section{grid-template-columns:1fr}}
+/* Hamburger */
+.hamburger {
+  display:none; flex-direction:column; gap:5px;
+  background:none; border:none; cursor:pointer; padding:8px;
+}
+.hamburger span {
+  width:22px; height:2px; background:var(--text);
+  border-radius:2px; transition:all 0.3s ease;
+}
+.hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
 
-  .card-3d {
-    background:var(--glass);
-    border:1px solid var(--border);
-    border-radius:22px;
-    backdrop-filter:blur(16px);
-    padding:30px;
-    position:relative;
-    overflow:hidden;
-    transition:transform 0.3s ease,box-shadow 0.3s ease;
-    box-shadow:0 4px 20px var(--shadow);
+@media(max-width:768px) {
+  .hamburger { display:flex; }
+  .nav-links {
+    position:fixed; top:var(--nav-h); left:0; right:0;
+    background:rgba(255,255,255,0.96);
+    backdrop-filter:blur(20px);
+    flex-direction:column; padding:16px 24px;
+    border-bottom:1px solid var(--border);
+    transform:translateY(-120%); opacity:0;
+    transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow:0 8px 32px rgba(0,0,0,0.08);
   }
-  .card-3d:hover {
-    transform:translateY(-3px);
-    box-shadow:0 12px 40px var(--shadow2),0 0 0 1px var(--border2);
-  }
+  .nav-links.open { transform:translateY(0); opacity:1; }
+  .nav-links a { padding:12px 16px; font-size:15px; }
+}
 
-  .card-shine {
-    position:absolute;inset:0;border-radius:22px;
-    background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 50%);
-    pointer-events:none;
-  }
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════════════════════════════ */
+.hero { padding:120px 0 60px; text-align:center; }
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:600; letter-spacing:1.5px;
+  color:var(--accent); text-transform:uppercase;
+  background:var(--accent-light); border:1px solid var(--border2);
+  padding:7px 20px; border-radius:99px; margin-bottom:28px;
+  backdrop-filter:blur(8px);
+  animation:fadeInDown 0.8s ease;
+}
+.hero h1 {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(36px,5.5vw,68px);
+  font-weight:800; line-height:1.08;
+  letter-spacing:-1.5px; margin-bottom:22px;
+  color:var(--text);
+  animation:fadeInUp 0.8s ease;
+}
+.hero h1 span {
+  background:linear-gradient(135deg,var(--accent),#43A047,var(--accent2));
+  background-size:200% 200%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:gradientShift 4s ease infinite;
+}
+@keyframes gradientShift {
+  0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}
+}
+.hero p {
+  font-size:17px; font-weight:400; color:var(--text2);
+  max-width:560px; margin:0 auto 48px; line-height:1.75;
+  animation:fadeInUp 0.8s ease 0.15s both;
+}
+.hero-cta {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:14px 32px; border:none; border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+  text-decoration:none; cursor:pointer;
+  box-shadow:0 6px 24px rgba(42,157,92,0.25);
+  transition:all 0.3s ease;
+  animation:fadeInUp 0.8s ease 0.3s both;
+}
+.hero-cta:hover {
+  transform:translateY(-3px);
+  box-shadow:0 10px 36px rgba(42,157,92,0.3);
+}
 
-  /* ── Drop Zone ── */
-  .drop-zone {
-    border:2px dashed var(--border2);
-    border-radius:16px;padding:44px 24px;
-    text-align:center;cursor:pointer;
-    transition:all 0.3s ease;position:relative;
-    background:var(--accent-light);
-  }
-  .drop-zone:hover,.drop-zone.dragover {
-    border-color:var(--accent);
-    background:var(--accent-light2);
-    box-shadow:inset 0 0 20px rgba(42,157,92,0.04);
-  }
-  .drop-icon {
-    width:60px;height:60px;margin:0 auto 14px;
-    background:linear-gradient(135deg,rgba(42,157,92,0.15),rgba(52,184,106,0.08));
-    border:1px solid var(--border2);border-radius:16px;
-    display:flex;align-items:center;justify-content:center;font-size:26px;
-    box-shadow:0 4px 16px rgba(42,157,92,0.10);
-    transition:transform 0.3s ease;
-  }
-  .drop-zone:hover .drop-icon{transform:scale(1.08) translateY(-2px)}
-  .drop-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;color:var(--text)}
-  .drop-sub{font-size:13px;color:var(--text3)}
+/* ═══════════════════════════════════════════════════════════════
+   FEATURE CARDS GRID
+   ═══════════════════════════════════════════════════════════════ */
+.features-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:20px; margin-bottom:56px;
+}
+@media(max-width:900px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.features-grid{grid-template-columns:1fr}}
 
-  #file-input{display:none}
-  #preview-img {
-    width:100%;border-radius:12px;object-fit:cover;
-    max-height:220px;display:none;
-    box-shadow:0 6px 24px var(--shadow2);
-  }
+.feature-card {
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px; padding:28px 22px;
+  backdrop-filter:blur(16px);
+  text-align:center; position:relative;
+  overflow:hidden;
+  transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 2px 16px var(--shadow);
+}
+.feature-card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 12px 44px var(--shadow2),0 0 0 1px var(--border2);
+  border-color:var(--border3);
+}
+.feature-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 50%);
+  pointer-events:none;
+}
+.feature-icon {
+  width:52px; height:52px; margin:0 auto 14px;
+  background:linear-gradient(135deg,rgba(76,175,80,0.12),rgba(102,187,106,0.08));
+  border:1px solid var(--border2); border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px;
+  transition:transform 0.3s ease;
+}
+.feature-card:hover .feature-icon { transform:scale(1.1) translateY(-2px); }
+.feature-card h3 {
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+  margin-bottom:8px; color:var(--text);
+}
+.feature-card p {
+  font-size:13px; color:var(--text3); line-height:1.6;
+}
 
-  /* ── Analyze Button ── */
-  .btn-analyze {
-    width:100%;margin-top:18px;
-    padding:15px;border:none;border-radius:14px;cursor:pointer;
-    font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
-    letter-spacing:0.3px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#fff;position:relative;overflow:hidden;
-    transition:all 0.3s ease;
-    box-shadow:0 6px 20px rgba(42,157,92,0.25);
-  }
-  .btn-analyze::before {
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);
-    opacity:0;transition:opacity 0.3s ease;
-  }
-  .btn-analyze:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(42,157,92,0.30)}
-  .btn-analyze:hover::before{opacity:1}
-  .btn-analyze:active{transform:translateY(0)}
-  .btn-analyze:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+/* ═══════════════════════════════════════════════════════════════
+   STATS ROW
+   ═══════════════════════════════════════════════════════════════ */
+.stats-row {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:16px; margin-bottom:40px;
+}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.stats-row{grid-template-columns:1fr}}
 
-  /* ── Result Panel ── */
-  .result-card {
-    background:var(--glass2);
-    border:1px solid var(--border);
-    border-radius:22px;backdrop-filter:blur(16px);
-    padding:30px;min-height:320px;
-    display:flex;flex-direction:column;
-    position:relative;overflow:hidden;
-    box-shadow:0 4px 20px var(--shadow);
-  }
-  .result-card::after {
-    content:'';position:absolute;
-    bottom:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,transparent,var(--accent),transparent);
-    opacity:0;transition:opacity 0.5s ease;
-  }
-  .result-card.loaded::after{opacity:1}
+.stat-card {
+  background:var(--glass); border:1px solid var(--border);
+  border-radius:18px; backdrop-filter:blur(12px);
+  padding:24px 18px; text-align:center;
+  position:relative; overflow:hidden;
+  transition:all 0.3s ease;
+  box-shadow:0 2px 12px var(--shadow);
+}
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px var(--shadow2); }
+.stat-num {
+  font-family:'Syne',sans-serif; font-size:32px; font-weight:800;
+  color:var(--accent); line-height:1;
+  background:linear-gradient(135deg,var(--accent3),var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-label {
+  font-size:11px; font-weight:500; color:var(--text3);
+  margin-top:6px; text-transform:uppercase; letter-spacing:1px;
+}
 
-  .result-idle {
-    flex:1;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;text-align:center;
-    color:var(--text3);
-  }
-  .idle-icon {
-    font-size:44px;margin-bottom:14px;opacity:0.5;
-    animation:float-idle 3s ease-in-out infinite;
-  }
-  @keyframes float-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* ── Disease pills ── */
+.diseases-row {
+  display:flex; flex-wrap:wrap; gap:10px;
+  justify-content:center; margin-bottom:60px;
+}
+.disease-pill {
+  font-size:13px; font-weight:500; padding:9px 20px;
+  border-radius:99px; background:var(--glass);
+  border:1px solid var(--border); backdrop-filter:blur(8px);
+  color:var(--text2); transition:all 0.25s ease; cursor:default;
+  display:flex; align-items:center; gap:9px;
+  box-shadow:0 1px 8px var(--shadow);
+}
+.disease-pill:hover {
+  background:var(--green-soft); border-color:var(--accent);
+  color:var(--accent3); transform:translateY(-2px);
+  box-shadow:0 4px 16px var(--shadow2);
+}
+.disease-pill span {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--accent); opacity:0.6; flex-shrink:0;
+}
 
-  /* ── Diagnosis Output ── */
-  #diagnosis-output{display:none}
-  .diag-badge {
-    display:inline-flex;align-items:center;gap:8px;
-    padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;
-    letter-spacing:0.5px;margin-bottom:18px;
-    background:var(--green-soft);border:1px solid var(--border2);color:var(--accent3);
-  }
-  .diag-condition {
-    font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
-    letter-spacing:-0.5px;margin-bottom:4px;
-    color:var(--text);
-  }
-  .diag-confidence {
-    font-size:13px;color:var(--text3);margin-bottom:18px;
-  }
+/* ── About section ── */
+.about-section {
+  display:grid; grid-template-columns:1fr 1fr; gap:32px;
+  margin-bottom:64px; align-items:center;
+}
+@media(max-width:700px){.about-section{grid-template-columns:1fr}}
 
-  /* ── Confidence Bar ── */
-  .conf-bar-wrap{margin-bottom:22px}
-  .conf-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:var(--text2)}
-  .conf-bar{height:6px;background:rgba(42,157,92,0.08);border-radius:99px;overflow:hidden}
-  .conf-fill {
-    height:100%;border-radius:99px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    box-shadow:0 0 8px rgba(42,157,92,0.3);
-    width:0%;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);
-  }
+.about-card {
+  background:var(--glass); border:1px solid var(--border);
+  border-radius:22px; padding:36px 30px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 4px 20px var(--shadow);
+}
+.about-card h2 {
+  font-family:'Syne',sans-serif; font-size:24px; font-weight:800;
+  margin-bottom:8px; color:var(--text);
+}
+.about-card .subtitle {
+  font-size:14px; color:var(--text3); margin-bottom:20px; line-height:1.7;
+}
+.about-list { list-style:none; }
+.about-list li {
+  display:flex; align-items:center; gap:10px;
+  font-size:13px; color:var(--text2); padding:6px 0;
+  border-bottom:1px solid rgba(76,175,80,0.06);
+}
+.about-list li:last-child { border-bottom:none; }
+.about-check {
+  width:20px; height:20px; border-radius:6px;
+  background:linear-gradient(135deg,rgba(76,175,80,0.15),rgba(102,187,106,0.08));
+  border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; color:var(--accent); flex-shrink:0;
+}
+.about-info-card {
+  background:linear-gradient(135deg,rgba(76,175,80,0.06),rgba(200,230,201,0.12));
+  border:1px solid var(--border2);
+  border-radius:22px; padding:36px 30px;
+  position:relative; overflow:hidden;
+}
+.about-info-card::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:140px; height:140px; border-radius:50%;
+  background:radial-gradient(circle,rgba(76,175,80,0.1),transparent 70%);
+}
+.about-info-card h3 {
+  font-family:'Syne',sans-serif; font-size:18px; font-weight:700;
+  color:var(--accent3); margin-bottom:14px;
+}
+.about-info-card p {
+  font-size:13px; color:var(--text2); line-height:1.7; margin-bottom:12px;
+}
+.tech-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.tech-tag {
+  font-size:11px; font-weight:600; padding:5px 12px;
+  border-radius:99px; background:rgba(76,175,80,0.08);
+  border:1px solid var(--border); color:var(--accent3);
+}
 
-  /* ── Description ── */
-  .diag-desc {
-    font-size:13px;line-height:1.8;color:var(--text2);
-    padding:14px 16px;background:var(--green-soft);
-    border-radius:12px;border-left:3px solid var(--accent);
-    margin-bottom:18px;
-  }
+/* ═══════════════════════════════════════════════════════════════
+   SECTION HEADINGS
+   ═══════════════════════════════════════════════════════════════ */
+.section-heading {
+  text-align:center; margin-bottom:48px;
+  padding-top:32px;
+}
+.section-heading .badge {
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:600; letter-spacing:1px;
+  color:var(--accent); text-transform:uppercase;
+  background:var(--accent-light); border:1px solid var(--border);
+  padding:6px 16px; border-radius:99px; margin-bottom:16px;
+}
+.section-heading h2 {
+  font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,42px);
+  font-weight:800; letter-spacing:-1px; color:var(--text);
+  margin-bottom:12px;
+}
+.section-heading p {
+  font-size:15px; color:var(--text3); max-width:500px;
+  margin:0 auto; line-height:1.7;
+}
 
-  /* ── Severity Tags ── */
-  .severity-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-  .severity-tag {
-    font-size:11px;font-weight:500;padding:4px 11px;border-radius:99px;
-    border:1px solid;
-  }
-  .sev-low{background:rgba(42,157,92,0.08);color:#1e7a45;border-color:rgba(42,157,92,0.2)}
-  .sev-med{background:rgba(192,154,21,0.08);color:#8a6f0a;border-color:rgba(192,154,21,0.2)}
-  .sev-high{background:rgba(220,71,71,0.08);color:#b93030;border-color:rgba(220,71,71,0.2)}
-  .sev-neutral{background:rgba(122,148,134,0.08);color:#5a7366;border-color:rgba(122,148,134,0.18)}
+/* ═══════════════════════════════════════════════════════════════
+   DATA ANALYSIS — Charts
+   ═══════════════════════════════════════════════════════════════ */
+.charts-grid {
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:24px; margin-bottom:64px;
+}
+@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
 
-  /* ── Next Steps ── */
-  .steps-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent3)}
-  .step-item {
-    display:flex;align-items:flex-start;gap:10px;
-    font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6;
-  }
-  .step-num {
-    min-width:20px;height:20px;border-radius:50%;
-    background:var(--green-soft);border:1px solid var(--border2);
-    color:var(--accent);font-size:10px;font-weight:700;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
-  }
+.chart-card {
+  background:var(--glass); border:1px solid var(--border);
+  border-radius:22px; padding:28px; position:relative;
+  backdrop-filter:blur(16px); overflow:hidden;
+  box-shadow:0 4px 20px var(--shadow);
+  transition:all 0.3s ease;
+}
+.chart-card:hover {
+  box-shadow:0 8px 36px var(--shadow2);
+  border-color:var(--border2);
+}
+.chart-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.4) 0%,transparent 50%);
+  pointer-events:none;
+}
+.chart-card h3 {
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+  color:var(--text); margin-bottom:16px; position:relative;
+}
+.chart-card canvas { position:relative; max-height:280px; }
 
-  /* ── Loading Spinner ── */
-  #loading-state{display:none;text-align:center;padding:44px 0}
-  .spinner-ring {
-    width:56px;height:56px;margin:0 auto 18px;
-    border:2px solid rgba(42,157,92,0.12);
-    border-top-color:var(--accent);
-    border-radius:50%;
-    animation:spin 0.8s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-text{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text2)}
-  .loading-sub{font-size:12px;color:var(--text3);margin-top:5px}
+.chart-card-wide {
+  grid-column:1/-1;
+}
 
-  /* ── Stats Row ── */
-  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
-  @media(max-width:600px){.stats-row{grid-template-columns:1fr}}
-  .stat-card {
-    background:var(--glass);border:1px solid var(--border);
-    border-radius:16px;backdrop-filter:blur(12px);
-    padding:22px 18px;text-align:center;
-    position:relative;overflow:hidden;
-    transition:transform 0.3s ease;
-    box-shadow:0 2px 12px var(--shadow);
-  }
-  .stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--shadow2)}
-  .stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--accent);line-height:1}
-  .stat-label{font-size:11px;font-weight:400;color:var(--text3);margin-top:5px;text-transform:uppercase;letter-spacing:1px}
+/* ═══════════════════════════════════════════════════════════════
+   MODEL PERFORMANCE — Tables & Cards
+   ═══════════════════════════════════════════════════════════════ */
+.model-comparison-wrapper { margin-bottom:40px; }
 
-  /* ── Diseases Supported ── */
-  .diseases-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:52px}
-  .disease-pill {
-    font-size:13px;font-weight:500;padding:8px 18px;
-    border-radius:99px;background:var(--glass);
-    border:1px solid var(--border);backdrop-filter:blur(8px);
-    color:var(--text2);transition:all 0.2s ease;cursor:default;
-    display:flex;align-items:center;gap:8px;
-    box-shadow:0 1px 6px var(--shadow);
-  }
-  .disease-pill:hover{background:var(--green-soft);border-color:var(--accent);color:var(--accent3)}
-  .disease-pill span{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0.6;flex-shrink:0}
+.comparison-table-wrap {
+  background:var(--glass); border:1px solid var(--border);
+  border-radius:22px; overflow:hidden;
+  box-shadow:0 4px 20px var(--shadow);
+  margin-bottom:32px;
+}
+.comparison-table {
+  width:100%; border-collapse:collapse; font-size:13px;
+}
+.comparison-table thead th {
+  background:linear-gradient(135deg,rgba(76,175,80,0.08),rgba(200,230,201,0.12));
+  padding:16px 18px; text-align:left;
+  font-family:'Syne',sans-serif; font-weight:700;
+  color:var(--accent3); font-size:12px;
+  text-transform:uppercase; letter-spacing:0.8px;
+  border-bottom:2px solid var(--border2);
+}
+.comparison-table tbody td {
+  padding:13px 18px; color:var(--text2);
+  border-bottom:1px solid rgba(76,175,80,0.06);
+  transition:background 0.2s ease;
+}
+.comparison-table tbody tr:hover td {
+  background:rgba(76,175,80,0.03);
+}
+.comparison-table tbody tr:last-child td { border-bottom:none; }
+.highlight-cell {
+  color:var(--accent3) !important;
+  font-weight:600;
+}
 
-  /* ── Disclaimer ── */
-  .disclaimer {
-    text-align:center;font-size:11px;color:var(--text3);
-    padding:16px;border-top:1px solid var(--border);margin-top:24px;line-height:1.7;
-  }
+/* Model chart */
+.model-chart-row {
+  display:grid; grid-template-columns:1fr 1fr; gap:24px;
+  margin-bottom:32px;
+}
+@media(max-width:700px){.model-chart-row{grid-template-columns:1fr}}
 
-  /* ── Fade animations ── */
-  .fade-in{animation:fadeIn 0.6s ease forwards}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Strengths/weaknesses */
+.sw-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:24px;
+  margin-bottom:40px;
+}
+@media(max-width:700px){.sw-grid{grid-template-columns:1fr}}
 
-  /* ── Error ── */
-  .error-msg {
-    background:rgba(220,71,71,0.06);border:1px solid rgba(220,71,71,0.18);
-    border-radius:12px;padding:12px 14px;font-size:12px;color:#b93030;margin-top:12px;display:none;
-  }
+.sw-card {
+  background:var(--glass); border:1px solid var(--border);
+  border-radius:20px; padding:28px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 16px var(--shadow);
+}
+.sw-card h3 {
+  font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+  color:var(--text); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px;
+}
+.sw-card h4 {
+  font-size:12px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.8px; margin-bottom:10px; margin-top:14px;
+}
+.sw-card h4.strengths-h { color:var(--accent3); }
+.sw-card h4.weak-h { color:var(--orange); }
+.sw-card ul { list-style:none; }
+.sw-card li {
+  font-size:13px; color:var(--text2); padding:5px 0;
+  display:flex; align-items:flex-start; gap:8px; line-height:1.5;
+}
 
-  /* ── Symptoms list ── */
-  .symptoms-section{margin-bottom:18px}
-  .symptoms-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent3)}
-  .symptom-item {
-    display:flex;align-items:center;gap:8px;
-    font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.5;
-  }
-  .symptom-dot {
-    width:4px;height:4px;border-radius:50%;
-    background:var(--accent);opacity:0.5;flex-shrink:0;
-  }
+/* Recommendation banner */
+.rec-banner {
+  background:linear-gradient(135deg,rgba(76,175,80,0.08),rgba(200,230,201,0.15));
+  border:1px solid var(--border2); border-radius:18px;
+  padding:24px 28px; margin-bottom:64px;
+  display:flex; align-items:flex-start; gap:14px;
+}
+.rec-icon {
+  width:44px; height:44px; border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; color:#fff; flex-shrink:0;
+}
+.rec-banner p {
+  font-size:14px; color:var(--text2); line-height:1.7;
+}
+.rec-banner strong { color:var(--accent3); }
 
-  /* ── Quality warnings ── */
-  .quality-warnings {
-    background:rgba(192,154,21,0.06);border:1px solid rgba(192,154,21,0.15);
-    border-radius:10px;padding:10px 14px;margin-bottom:14px;
-    font-size:11px;color:#8a6f0a;
-  }
-  .quality-warnings div{margin-bottom:3px}
-  .quality-warnings div:last-child{margin-bottom:0}
+/* ═══════════════════════════════════════════════════════════════
+   PREDICT — Upload & Result
+   ═══════════════════════════════════════════════════════════════ */
+.predict-section {
+  display:grid; grid-template-columns:1fr 1fr; gap:28px;
+  margin-bottom:40px;
+}
+@media(max-width:768px){.predict-section{grid-template-columns:1fr}}
 
-  /* ── Top predictions bar ── */
-  .top-preds{margin-bottom:18px}
-  .top-preds-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent3)}
-  .pred-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
-  .pred-name{font-size:11px;color:var(--text2);min-width:80px;text-transform:capitalize}
-  .pred-bar-bg{flex:1;height:5px;background:rgba(42,157,92,0.06);border-radius:99px;overflow:hidden}
-  .pred-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(42,157,92,0.5),rgba(52,184,106,0.3));transition:width 1s ease}
-  .pred-pct{font-size:10px;color:var(--text3);min-width:40px;text-align:right}
+.card-3d {
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:22px;
+  backdrop-filter:blur(16px);
+  padding:32px;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.3s ease,box-shadow 0.3s ease;
+  box-shadow:0 4px 20px var(--shadow);
+}
+.card-3d:hover {
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px var(--shadow2),0 0 0 1px var(--border2);
+}
+.card-shine {
+  position:absolute; inset:0; border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 50%);
+  pointer-events:none;
+}
+.card-title {
+  font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+  color:var(--text); margin-bottom:18px;
+}
 
-  /* ── Section titles ── */
-  .section-title {
-    font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
-    margin-bottom:18px;color:var(--accent3);
-  }
+/* ── Drop Zone ── */
+.drop-zone {
+  border:2px dashed var(--border2);
+  border-radius:16px; padding:44px 24px;
+  text-align:center; cursor:pointer;
+  transition:all 0.3s ease; position:relative;
+  background:var(--accent-light);
+}
+.drop-zone:hover,.drop-zone.dragover {
+  border-color:var(--accent);
+  background:var(--accent-light2);
+  box-shadow:inset 0 0 20px rgba(42,157,92,0.04);
+}
+.drop-icon {
+  width:64px; height:64px; margin:0 auto 14px;
+  background:linear-gradient(135deg,rgba(42,157,92,0.15),rgba(52,184,106,0.08));
+  border:1px solid var(--border2); border-radius:16px;
+  display:flex; align-items:center; justify-content:center; font-size:28px;
+  box-shadow:0 4px 16px rgba(42,157,92,0.10);
+  transition:transform 0.3s ease;
+}
+.drop-zone:hover .drop-icon { transform:scale(1.08) translateY(-2px); }
+.drop-title {
+  font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+  margin-bottom:6px; color:var(--text);
+}
+.drop-sub { font-size:13px; color:var(--text3); }
+
+#file-input { display:none; }
+#preview-img {
+  width:100%; border-radius:14px; object-fit:cover;
+  max-height:240px; display:none;
+  box-shadow:0 6px 24px var(--shadow2);
+}
+
+/* ── Analyze Button ── */
+.btn-analyze {
+  width:100%; margin-top:18px;
+  padding:16px; border:none; border-radius:14px; cursor:pointer;
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+  letter-spacing:0.3px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; position:relative; overflow:hidden;
+  transition:all 0.3s ease;
+  box-shadow:0 6px 20px rgba(42,157,92,0.25);
+}
+.btn-analyze::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);
+  opacity:0; transition:opacity 0.3s ease;
+}
+.btn-analyze:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(42,157,92,0.30); }
+.btn-analyze:hover::before { opacity:1; }
+.btn-analyze:active { transform:translateY(0); }
+.btn-analyze:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+
+/* ── PDF Download Button ── */
+.btn-pdf {
+  width:100%; margin-top:12px;
+  padding:13px; border:none; border-radius:12px; cursor:pointer;
+  font-family:'Syne',sans-serif; font-size:14px; font-weight:700;
+  background:linear-gradient(135deg,#1B5E20,#2E7D32);
+  color:#fff; position:relative; overflow:hidden;
+  transition:all 0.3s ease;
+  box-shadow:0 4px 16px rgba(27,94,32,0.2);
+  display:none;
+}
+.btn-pdf:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 28px rgba(27,94,32,0.28);
+}
+.btn-pdf:active { transform:translateY(0); }
+
+/* ── Result Card ── */
+.result-card {
+  min-height:380px;
+  display:flex; flex-direction:column;
+}
+.result-card::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0; transition:opacity 0.5s ease;
+}
+.result-card.loaded::after { opacity:1; }
+
+.result-idle {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  color:var(--text3);
+}
+.idle-icon {
+  font-size:48px; margin-bottom:14px; opacity:0.5;
+  animation:float-idle 3s ease-in-out infinite;
+}
+@keyframes float-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ── Diagnosis Output ── */
+#diagnosis-output { display:none; }
+.diag-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:99px; font-size:12px; font-weight:600;
+  letter-spacing:0.5px; margin-bottom:18px;
+  background:var(--green-soft); border:1px solid var(--border2); color:var(--accent3);
+}
+.diag-condition {
+  font-family:'Syne',sans-serif; font-size:26px; font-weight:800;
+  letter-spacing:-0.5px; margin-bottom:4px;
+  color:var(--text);
+}
+.diag-confidence {
+  font-size:13px; color:var(--text3); margin-bottom:18px;
+}
+
+/* Confidence bar */
+.conf-bar-wrap { margin-bottom:22px; }
+.conf-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; color:var(--text2); }
+.conf-bar { height:7px; background:rgba(42,157,92,0.08); border-radius:99px; overflow:hidden; }
+.conf-fill {
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  box-shadow:0 0 8px rgba(42,157,92,0.3);
+  width:0%; transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* TTA metrics */
+.tta-metrics {
+  display:none; margin:10px 0 6px; padding:12px 16px;
+  background:rgba(42,157,92,0.06); border:1px solid rgba(42,157,92,0.15);
+  border-radius:12px;
+}
+.tta-inner {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:0.82rem; color:var(--text); flex-wrap:wrap; gap:8px;
+}
+
+/* Quality warnings */
+.quality-warnings {
+  background:rgba(192,154,21,0.06); border:1px solid rgba(192,154,21,0.15);
+  border-radius:10px; padding:10px 14px; margin-bottom:14px;
+  font-size:12px; color:#8a6f0a; display:none;
+}
+.quality-warnings div { margin-bottom:3px; }
+.quality-warnings div:last-child { margin-bottom:0; }
+
+/* Description */
+.diag-desc {
+  font-size:13px; line-height:1.8; color:var(--text2);
+  padding:14px 16px; background:var(--green-soft);
+  border-radius:12px; border-left:3px solid var(--accent);
+  margin-bottom:18px;
+}
+
+/* Severity tags */
+.severity-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+.severity-tag {
+  font-size:11px; font-weight:500; padding:5px 12px; border-radius:99px;
+  border:1px solid;
+}
+.sev-low { background:rgba(42,157,92,0.08); color:#1e7a45; border-color:rgba(42,157,92,0.2); }
+.sev-med { background:rgba(192,154,21,0.08); color:#8a6f0a; border-color:rgba(192,154,21,0.2); }
+.sev-high { background:rgba(220,71,71,0.08); color:#b93030; border-color:rgba(220,71,71,0.2); }
+.sev-neutral { background:rgba(122,148,134,0.08); color:#5a7366; border-color:rgba(122,148,134,0.18); }
+
+/* Symptoms */
+.symptoms-section { margin-bottom:18px; display:none; }
+.symptoms-title,.steps-title,.preds-title,.meds-title {
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+  margin-bottom:10px; color:var(--accent3);
+}
+.symptom-item {
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; color:var(--text2); margin-bottom:5px; line-height:1.5;
+}
+.symptom-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--accent); opacity:0.5; flex-shrink:0;
+}
+
+/* Top predictions */
+.top-preds { margin-bottom:18px; display:none; }
+.pred-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.pred-name { font-size:11px; color:var(--text2); min-width:80px; text-transform:capitalize; }
+.pred-bar-bg { flex:1; height:5px; background:rgba(42,157,92,0.06); border-radius:99px; overflow:hidden; }
+.pred-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,rgba(42,157,92,0.5),rgba(52,184,106,0.3)); transition:width 1s ease; }
+.pred-pct { font-size:10px; color:var(--text3); min-width:40px; text-align:right; }
+
+/* Step items */
+.step-item {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:12px; color:var(--text2); margin-bottom:8px; line-height:1.6;
+}
+.step-num {
+  min-width:22px; height:22px; border-radius:50%;
+  background:var(--green-soft); border:1px solid var(--border2);
+  color:var(--accent); font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+}
+
+/* Medications */
+.meds-section { margin-bottom:18px; display:none; }
+.med-item {
+  font-size:12px; color:var(--text2); margin-bottom:5px;
+  padding:8px 12px; background:rgba(76,175,80,0.04);
+  border-radius:8px; border-left:3px solid var(--accent);
+}
+.med-item strong { color:var(--text); }
+
+/* Loading spinner */
+#loading-state { display:none; text-align:center; padding:44px 0; }
+.spinner-ring {
+  width:56px; height:56px; margin:0 auto 18px;
+  border:2.5px solid rgba(42,157,92,0.12);
+  border-top-color:var(--accent);
+  border-radius:50%; animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text { font-family:'Syne',sans-serif; font-size:14px; font-weight:600; color:var(--text2); }
+.loading-sub { font-size:12px; color:var(--text3); margin-top:5px; }
+
+/* Error */
+.error-msg {
+  background:rgba(220,71,71,0.06); border:1px solid rgba(220,71,71,0.18);
+  border-radius:12px; padding:12px 14px; font-size:12px; color:#b93030;
+  margin-top:12px; display:none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+.site-footer {
+  text-align:center; padding:32px 20px;
+  border-top:1px solid var(--border); margin-top:32px;
+}
+.footer-disclaimer {
+  font-size:11px; color:var(--text-muted); line-height:1.7;
+  max-width:700px; margin:0 auto 16px;
+}
+.footer-copy {
+  font-size:11px; color:var(--text3);
+}
+.footer-copy a { color:var(--accent); text-decoration:none; }
+.footer-copy a:hover { text-decoration:underline; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes fadeInUp {
+  from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeInDown {
+  from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}
+}
+.fade-in { animation:fadeInUp 0.6s ease forwards; }
+
+/* Scroll reveal */
+.reveal {
+  opacity:0; transform:translateY(24px);
+  transition:all 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal.visible {
+  opacity:1; transform:translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb {
+  background:linear-gradient(180deg,rgba(76,175,80,0.3),rgba(102,187,106,0.3));
+  border-radius:10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background:linear-gradient(180deg,rgba(76,175,80,0.5),rgba(102,187,106,0.5));
+}
+* { scrollbar-width:thin; scrollbar-color:rgba(76,175,80,0.3) var(--bg); }
+
+/* ── Section divider ── */
+.section-divider {
+  height:1px; border:none; margin:0;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+}
 </style>
 </head>
 <body>
@@ -392,157 +853,733 @@
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 <div class="orb orb3"></div>
+<div class="orb orb4"></div>
 
-<div class="wrap">
-
-  <!-- Nav -->
-  <nav>
-    <div class="logo">
+<!-- ═══════════════════════════════════════════════════════════
+     NAVBAR
+     ═══════════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#home" class="logo">
       <div class="logo-dot"></div>
-      Skin Disease Detection Using Deep Learning
-    </div>
-    <div class="nav-badge">Deep Learning Powered</div>
-  </nav>
+      Skin Disease Detection
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#home" class="active" data-section="home">Home</a></li>
+      <li><a href="#analysis" data-section="analysis">Data Analysis</a></li>
+      <li><a href="#models" data-section="models">Model Performance</a></li>
+      <li><a href="#predict" data-section="predict">Predict</a></li>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-eyebrow">
-      <span>◆</span> MobileNetV2 Vision Model
-    </div>
-    <h1>Detect. Diagnose.<br><span>Understand.</span></h1>
-    <p>Upload a skin image and receive instant AI-powered analysis with condition identification, severity assessment, and care recommendations — powered by deep learning.</p>
-  </section>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card" id="stat-confidence">
-      <div class="stat-num">~90%</div>
-      <div class="stat-label">Model Accuracy</div>
-    </div>
-    <div class="stat-card" id="stat-conditions">
-      <div class="stat-num">5</div>
-      <div class="stat-label">Conditions Detected</div>
-    </div>
-    <div class="stat-card" id="stat-speed">
-      <div class="stat-num">&lt;3s</div>
-      <div class="stat-label">Analysis Time</div>
-    </div>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+</nav>
 
-  <!-- Supported Conditions -->
-  <div class="diseases-row">
-    <div class="disease-pill"><span></span>Acne</div>
-    <div class="disease-pill"><span></span>Eczema</div>
-    <div class="disease-pill"><span></span>Fungal Infection</div>
-    <div class="disease-pill"><span></span>Psoriasis</div>
-    <div class="disease-pill"><span></span>Normal Skin</div>
-  </div>
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 1: HOME
+     ═══════════════════════════════════════════════════════════ -->
+<section id="home">
+  <div class="wrap">
 
-  <!-- Upload + Result -->
-  <div class="upload-section">
-
-    <!-- Upload Card -->
-    <div class="card-3d" id="upload-card">
-      <div class="card-shine"></div>
-      <div class="section-title">Upload Image</div>
-
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="file-input" accept="image/*">
-        <img id="preview-img" alt="Preview">
-        <div id="drop-content">
-          <div class="drop-icon">🔬</div>
-          <div class="drop-title">Drop your skin image</div>
-          <div class="drop-sub">PNG, JPG, WEBP · Max 10MB</div>
-        </div>
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-eyebrow">
+        <span>◆</span> MobileNetV2 Deep Learning Model
       </div>
-
-      <button class="btn-analyze" id="analyze-btn" disabled onclick="analyzeImage()">
-        ✦ Analyze Skin Condition
-      </button>
-      <div class="error-msg" id="error-msg"></div>
+      <h1>Detect. Diagnose.<br><span>Understand.</span></h1>
+      <p>Upload a skin image and receive instant AI-powered analysis with condition identification, severity assessment, and care recommendations — powered by deep learning.</p>
+      <a href="#predict" class="hero-cta">
+        ✦ Start Diagnosis
+      </a>
     </div>
 
-    <!-- Result Card -->
-    <div class="card-3d result-card" id="result-card">
-      <div class="card-shine"></div>
-
-      <!-- Idle state -->
-      <div class="result-idle" id="idle-state">
-        <div class="idle-icon">🌿</div>
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text)">Awaiting Analysis</div>
-        <div style="font-size:13px">Upload an image to receive your AI diagnosis report</div>
+    <!-- Features -->
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Data Analysis</h3>
+        <p>Interactive charts covering disease distribution, severity metrics, and model confidence patterns.</p>
       </div>
-
-      <!-- Loading -->
-      <div id="loading-state">
-        <div class="spinner-ring"></div>
-        <div class="loading-text">Analyzing with 8-pass TTA…</div>
-        <div class="loading-sub">Running MobileNetV2 × 8 augmented views</div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Model Benchmarks</h3>
+        <p>Compare Custom CNN and MobileNetV2 across Accuracy, Precision, Recall, and F1 Score.</p>
       </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Live Predictions</h3>
+        <p>Upload a skin image and get an instant AI-powered diagnosis with confidence scores.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📥</div>
+        <h3>PDF Reports</h3>
+        <p>Download a professional clinical-style PDF report of every diagnosis for your records.</p>
+      </div>
+    </div>
 
-      <!-- Diagnosis output -->
-      <div id="diagnosis-output" class="fade-in">
-        <div class="diag-badge" id="d-badge">✦ Diagnosis Complete</div>
-        <div class="diag-condition" id="d-condition"></div>
-        <div class="diag-confidence" id="d-conf"></div>
+    <!-- Stats -->
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <div class="stat-num">~92%</div>
+        <div class="stat-label">Model Accuracy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Conditions Detected</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">&lt;3s</div>
+        <div class="stat-label">Analysis Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">8×</div>
+        <div class="stat-label">TTA Passes</div>
+      </div>
+    </div>
 
-        <div class="conf-bar-wrap">
-          <div class="conf-label"><span>Confidence Score</span><span id="d-conf-pct">—</span></div>
-          <div class="conf-bar"><div class="conf-fill" id="conf-fill"></div></div>
+    <!-- Disease pills -->
+    <div class="diseases-row reveal">
+      <div class="disease-pill"><span></span>🧴 Acne</div>
+      <div class="disease-pill"><span></span>💧 Eczema</div>
+      <div class="disease-pill"><span></span>🍄 Fungal Infection</div>
+      <div class="disease-pill"><span></span>🩹 Psoriasis</div>
+      <div class="disease-pill"><span></span>✅ Normal / Healthy Skin</div>
+    </div>
+
+    <!-- About -->
+    <div class="about-section reveal">
+      <div class="about-card">
+        <h2>About the Project</h2>
+        <p class="subtitle">Built on a curated dermatological dataset with 5 skin condition classes, using transfer learning for high accuracy screening.</p>
+        <ul class="about-list">
+          <li><div class="about-check">✓</div>MobileNetV2 Transfer Learning Architecture</li>
+          <li><div class="about-check">✓</div>8-Pass Test-Time Augmentation (TTA)</li>
+          <li><div class="about-check">✓</div>Grad-CAM++ Explainability Heatmaps</li>
+          <li><div class="about-check">✓</div>Image Quality & OOD Detection</li>
+          <li><div class="about-check">✓</div>Reliability Analysis with Entropy Scoring</li>
+          <li><div class="about-check">✓</div>Professional PDF Report Generation</li>
+        </ul>
+      </div>
+      <div class="about-info-card">
+        <h3>Technology Stack</h3>
+        <p>A production-grade AI system combining deep learning, computer vision, and modern web technologies for accessible skin health screening.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">TensorFlow</span>
+          <span class="tech-tag">MobileNetV2</span>
+          <span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">Streamlit</span>
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">Chart.js</span>
+          <span class="tech-tag">jsPDF</span>
+          <span class="tech-tag">Grad-CAM++</span>
         </div>
+        <p style="margin-top:18px; font-size:12px; color:var(--text-muted);">
+          B.Tech Mini Project · Deep Learning · Computer Science & Engineering
+        </p>
+      </div>
+    </div>
 
-        <!-- TTA metrics row -->
-        <div id="d-tta-metrics" style="display:none;margin:10px 0 6px;padding:10px 14px;background:rgba(42,157,92,0.06);border:1px solid rgba(42,157,92,0.15);border-radius:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--text)">
-            <span>🔄 <strong>TTA</strong> <span id="d-tta-passes">8</span> passes</span>
-            <span>🎯 Agreement: <strong id="d-tta-agree">—</strong></span>
-            <span>⚡ <span id="d-tta-latency">—</span></span>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 2: DATA ANALYSIS
+     ═══════════════════════════════════════════════════════════ -->
+<section id="analysis">
+  <div class="wrap">
+
+    <div class="section-heading reveal">
+      <div class="badge"><span>📊</span> Exploratory Analysis</div>
+      <h2>Data Analysis</h2>
+      <p>Visual insights from the dermatological dataset used to train the model</p>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card reveal">
+        <h3>🎯 Disease Class Distribution</h3>
+        <canvas id="chart-distribution"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>⚠️ Severity Levels by Condition</h3>
+        <canvas id="chart-severity"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>📈 Model Confidence Ranges</h3>
+        <canvas id="chart-confidence"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>🕸️ Symptom Coverage per Condition</h3>
+        <canvas id="chart-symptoms"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>💊 Treatment Categories</h3>
+        <canvas id="chart-treatments"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>🔬 Condition Risk Assessment</h3>
+        <canvas id="chart-risk"></canvas>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 3: MODEL PERFORMANCE
+     ═══════════════════════════════════════════════════════════ -->
+<section id="models">
+  <div class="wrap">
+
+    <div class="section-heading reveal">
+      <div class="badge"><span>🤖</span> Performance Metrics</div>
+      <h2>Model Performance</h2>
+      <p>Comparing Custom CNN and MobileNetV2 on skin disease classification</p>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-table-wrap reveal">
+      <table class="comparison-table" id="comparison-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Custom CNN</th>
+            <th>MobileNetV2 (Transfer Learning)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Architecture</td><td>3-Block CNN (32→64→128)</td><td class="highlight-cell">MobileNetV2 + Custom Head (GAP → 256 → softmax)</td></tr>
+          <tr><td>Total Parameters</td><td>~1.2M</td><td>~2.6M</td></tr>
+          <tr><td>Trainable Parameters</td><td>~1.2M (all)</td><td class="highlight-cell">~590K (head) / ~2.6M (fine-tuned)</td></tr>
+          <tr><td>Accuracy</td><td>~78–85%</td><td class="highlight-cell">~92–96%</td></tr>
+          <tr><td>Precision</td><td>~77–84%</td><td class="highlight-cell">~92–96%</td></tr>
+          <tr><td>Recall</td><td>~76–83%</td><td class="highlight-cell">~91–95%</td></tr>
+          <tr><td>F1-Score</td><td>~76–83%</td><td class="highlight-cell">~91–95%</td></tr>
+          <tr><td>Inference Time</td><td class="highlight-cell">~50ms (single pass)</td><td>~200ms (single) / ~1.5s (8-pass TTA)</td></tr>
+          <tr><td>Model Size</td><td class="highlight-cell">~5 MB</td><td>~13 MB</td></tr>
+          <tr><td>Training Time</td><td class="highlight-cell">~15 min (20 epochs)</td><td>~25 min (20 epochs + 10 fine-tune)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Performance Charts -->
+    <div class="model-chart-row">
+      <div class="chart-card reveal">
+        <h3>📊 Accuracy Comparison — All Metrics</h3>
+        <canvas id="chart-model-compare"></canvas>
+      </div>
+      <div class="chart-card reveal">
+        <h3>⚡ Efficiency Metrics</h3>
+        <canvas id="chart-efficiency"></canvas>
+      </div>
+    </div>
+
+    <!-- Strengths / Weaknesses -->
+    <div class="sw-grid reveal">
+      <div class="sw-card">
+        <h3>🧪 Custom CNN</h3>
+        <h4 class="strengths-h">✅ Strengths</h4>
+        <ul>
+          <li>✅ Lightweight and fast inference</li>
+          <li>✅ Easy to understand and modify</li>
+          <li>✅ Good for small datasets</li>
+          <li>✅ Lower computational requirements</li>
+        </ul>
+
+      </div>
+      <div class="sw-card">
+        <h3>🚀 MobileNetV2 (Transfer Learning)</h3>
+        <h4 class="strengths-h">✅ Strengths</h4>
+        <ul>
+          <li>✅ High accuracy from ImageNet pretrained features</li>
+          <li>✅ Excellent generalization on small datasets</li>
+          <li>✅ Fine-tuning unlocks domain-specific adaptation</li>
+          <li>✅ State-of-the-art mobile-optimized architecture</li>
+        </ul>
+
+      </div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="rec-banner reveal">
+      <div class="rec-icon">💡</div>
+      <p><strong>Recommendation:</strong> Use <strong>MobileNetV2 with Fine-Tuning</strong> for production. It achieves 10–15% higher accuracy than the Custom CNN by leveraging pretrained ImageNet features. The Custom CNN is suitable for learning purposes and resource-constrained environments where model size matters.</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 4: PREDICT
+     ═══════════════════════════════════════════════════════════ -->
+<section id="predict">
+  <div class="wrap">
+
+    <div class="section-heading reveal">
+      <div class="badge"><span>🎯</span> AI Diagnosis</div>
+      <h2>Predict Skin Condition</h2>
+      <p>Upload a clear photo of the affected skin area for instant AI analysis</p>
+    </div>
+
+    <div class="predict-section">
+
+      <!-- Upload Card -->
+      <div class="card-3d reveal" id="upload-card">
+        <div class="card-shine"></div>
+        <div class="card-title">📤 Upload Image</div>
+
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept="image/*">
+          <img id="preview-img" alt="Preview">
+          <div id="drop-content">
+            <div class="drop-icon">🔬</div>
+            <div class="drop-title">Drop your skin image here</div>
+            <div class="drop-sub">PNG, JPG, WEBP · Max 10 MB</div>
           </div>
         </div>
 
-        <!-- Quality warnings -->
-        <div class="quality-warnings" id="d-quality" style="display:none"></div>
-
-        <div class="diag-desc" id="d-desc"></div>
-
-        <div class="severity-row" id="d-tags"></div>
-
-        <!-- Symptoms -->
-        <div class="symptoms-section" id="d-symptoms-section" style="display:none">
-          <div class="symptoms-title">Common Symptoms</div>
-          <div id="d-symptoms"></div>
-        </div>
-
-        <!-- Top predictions -->
-        <div class="top-preds" id="d-top-preds" style="display:none">
-          <div class="top-preds-title">Top Predictions</div>
-          <div id="d-preds-list"></div>
-        </div>
-
-        <div class="steps-title">Recommended Next Steps</div>
-        <div id="d-steps"></div>
+        <button class="btn-analyze" id="analyze-btn" disabled onclick="analyzeImage()">
+          ✦ Analyze Skin Condition
+        </button>
+        <button class="btn-pdf" id="pdf-btn" onclick="downloadPDF()">
+          📥 Download PDF Report
+        </button>
+        <div class="error-msg" id="error-msg"></div>
       </div>
+
+      <!-- Result Card -->
+      <div class="card-3d result-card" id="result-card">
+        <div class="card-shine"></div>
+
+        <!-- Idle state -->
+        <div class="result-idle" id="idle-state">
+          <div class="idle-icon">🌿</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">Awaiting Analysis</div>
+          <div style="font-size:13px;color:var(--text3)">Upload an image to receive your AI diagnosis report</div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading-state">
+          <div class="spinner-ring"></div>
+          <div class="loading-text">Analyzing with 8-pass TTA…</div>
+          <div class="loading-sub">Running MobileNetV2 × 8 augmented views</div>
+        </div>
+
+        <!-- Diagnosis output -->
+        <div id="diagnosis-output" class="fade-in">
+          <div class="diag-badge" id="d-badge">✦ Diagnosis Complete</div>
+          <div class="diag-condition" id="d-condition"></div>
+          <div class="diag-confidence" id="d-conf"></div>
+
+          <div class="conf-bar-wrap">
+            <div class="conf-label"><span>Confidence Score</span><span id="d-conf-pct">—</span></div>
+            <div class="conf-bar"><div class="conf-fill" id="conf-fill"></div></div>
+          </div>
+
+          <!-- TTA metrics -->
+          <div class="tta-metrics" id="d-tta-metrics">
+            <div class="tta-inner">
+              <span>🔄 <strong>TTA</strong> <span id="d-tta-passes">8</span> passes</span>
+              <span>🎯 Agreement: <strong id="d-tta-agree">—</strong></span>
+              <span>⚡ <span id="d-tta-latency">—</span></span>
+            </div>
+          </div>
+
+          <!-- Quality warnings -->
+          <div class="quality-warnings" id="d-quality"></div>
+
+          <div class="diag-desc" id="d-desc"></div>
+          <div class="severity-row" id="d-tags"></div>
+
+          <!-- Symptoms -->
+          <div class="symptoms-section" id="d-symptoms-section">
+            <div class="symptoms-title">🔍 Common Symptoms</div>
+            <div id="d-symptoms"></div>
+          </div>
+
+          <!-- Top predictions -->
+          <div class="top-preds" id="d-top-preds">
+            <div class="preds-title">📈 Top Predictions</div>
+            <div id="d-preds-list"></div>
+          </div>
+
+          <!-- Medications -->
+          <div class="meds-section" id="d-meds-section">
+            <div class="meds-title">💊 Suggested OTC Medications</div>
+            <div id="d-meds"></div>
+          </div>
+
+          <div class="steps-title">📋 Recommended Next Steps</div>
+          <div id="d-steps"></div>
+        </div>
+      </div>
+
     </div>
   </div>
+</section>
 
-  <!-- Disclaimer -->
-  <div class="disclaimer">
-    ⚠️ This system is for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.<br>
-    Always consult a certified dermatologist for clinical evaluation and treatment.
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-disclaimer">
+    ⚠️ <strong>Medical Disclaimer:</strong> This system is for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult a certified dermatologist for clinical evaluation and treatment.
   </div>
+  <div class="footer-copy">
+    © 2025 Skin Disease Detection Using Deep Learning · Built with <a href="https://fastapi.tiangolo.com" target="_blank">FastAPI</a> + <a href="https://www.tensorflow.org" target="_blank">TensorFlow</a>
+  </div>
+</footer>
 
-</div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════════ -->
 <script>
-/* ── DOM References ── */
+/* ═══════════════════════════════════════════════════════════════
+   NAVBAR — Scroll + Hamburger + Active link
+   ═══════════════════════════════════════════════════════════════ */
+const navbar = document.getElementById('navbar');
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+const navAnchors = document.querySelectorAll('.nav-links a');
+
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 20);
+  updateActiveNav();
+});
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+
+// Close mobile menu on link click
+navAnchors.forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+
+function updateActiveNav() {
+  const sections = ['home','analysis','models','predict'];
+  let current = 'home';
+  for (const id of sections) {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= 100) current = id;
+  }
+  navAnchors.forEach(a => {
+    a.classList.toggle('active', a.dataset.section === current);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL REVEAL
+   ═══════════════════════════════════════════════════════════════ */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ═══════════════════════════════════════════════════════════════
+   CHART.JS — Data Analysis
+   ═══════════════════════════════════════════════════════════════ */
+const chartColors = {
+  acne: '#66BB6A',
+  eczema: '#42A5F5',
+  fungal: '#FFA726',
+  psoriasis: '#EF5350',
+  normal: '#AB47BC',
+};
+const chartBg = {
+  acne: 'rgba(102,187,106,0.15)',
+  eczema: 'rgba(66,165,245,0.15)',
+  fungal: 'rgba(255,167,38,0.15)',
+  psoriasis: 'rgba(239,83,80,0.15)',
+  normal: 'rgba(171,71,188,0.15)',
+};
+const labels5 = ['Acne','Eczema','Fungal','Psoriasis','Normal'];
+const colors5 = [chartColors.acne, chartColors.eczema, chartColors.fungal, chartColors.psoriasis, chartColors.normal];
+const bgColors5 = [chartBg.acne, chartBg.eczema, chartBg.fungal, chartBg.psoriasis, chartBg.normal];
+
+const defaultFont = { family:"'DM Sans', sans-serif", size:12, weight:500 };
+Chart.defaults.font = defaultFont;
+Chart.defaults.color = '#689F38';
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyleWidth = 10;
+Chart.defaults.plugins.legend.labels.padding = 14;
+
+// 1. Disease Distribution — Doughnut
+new Chart(document.getElementById('chart-distribution'), {
+  type: 'doughnut',
+  data: {
+    labels: labels5,
+    datasets: [{
+      data: [220, 190, 200, 180, 210],
+      backgroundColor: colors5,
+      borderWidth: 0,
+      hoverOffset: 8,
+    }],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position:'bottom' },
+    },
+    cutout: '62%',
+  },
+});
+
+// 2. Severity — Bar
+new Chart(document.getElementById('chart-severity'), {
+  type: 'bar',
+  data: {
+    labels: labels5,
+    datasets: [{
+      label: 'Base Severity (0–10)',
+      data: [2, 4, 3, 7, 0],
+      backgroundColor: colors5,
+      borderRadius: 8,
+      borderSkipped: false,
+      barThickness: 36,
+    }],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend:{ display:false } },
+    scales: {
+      y: { beginAtZero:true, max:10, grid:{ color:'rgba(76,175,80,0.06)' } },
+      x: { grid:{ display:false } },
+    },
+  },
+});
+
+// 3. Confidence Ranges — Horizontal Bar
+new Chart(document.getElementById('chart-confidence'), {
+  type: 'bar',
+  data: {
+    labels: labels5,
+    datasets: [
+      {
+        label: 'Min Confidence',
+        data: [78, 82, 80, 85, 90],
+        backgroundColor: bgColors5.map(c => c.replace('0.15','0.4')),
+        borderRadius: 6,
+        barThickness: 18,
+      },
+      {
+        label: 'Max Confidence',
+        data: [95, 96, 94, 97, 99],
+        backgroundColor: colors5,
+        borderRadius: 6,
+        barThickness: 18,
+      },
+    ],
+  },
+  options: {
+    responsive: true, indexAxis:'y',
+    plugins: { legend:{ position:'bottom' } },
+    scales: {
+      x: { min:60, max:100, grid:{ color:'rgba(76,175,80,0.06)' } },
+      y: { grid:{ display:false } },
+    },
+  },
+});
+
+// 4. Symptoms — Radar
+new Chart(document.getElementById('chart-symptoms'), {
+  type: 'radar',
+  data: {
+    labels: ['Redness','Itching','Scaling','Bumps/Lesions','Pain/Burning'],
+    datasets: [
+      { label:'Acne', data:[4,2,1,5,2], borderColor:chartColors.acne, backgroundColor:chartBg.acne, pointRadius:3 },
+      { label:'Eczema', data:[4,5,4,3,2], borderColor:chartColors.eczema, backgroundColor:chartBg.eczema, pointRadius:3 },
+      { label:'Psoriasis', data:[5,4,5,3,4], borderColor:chartColors.psoriasis, backgroundColor:chartBg.psoriasis, pointRadius:3 },
+      { label:'Fungal', data:[3,4,3,2,3], borderColor:chartColors.fungal, backgroundColor:chartBg.fungal, pointRadius:3 },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend:{ position:'bottom' } },
+    scales: {
+      r: {
+        beginAtZero:true, max:5,
+        pointLabels: { font:{ size:11 } },
+        grid: { color:'rgba(76,175,80,0.08)' },
+        angleLines: { color:'rgba(76,175,80,0.08)' },
+      },
+    },
+  },
+});
+
+// 5. Treatment Categories — Polar Area
+new Chart(document.getElementById('chart-treatments'), {
+  type: 'polarArea',
+  data: {
+    labels: ['Topical Creams','Oral Medications','Lifestyle Changes','Moisturizers','Specialist Referral'],
+    datasets: [{
+      data: [5, 2, 4, 3, 4],
+      backgroundColor: [
+        'rgba(102,187,106,0.5)',
+        'rgba(66,165,245,0.5)',
+        'rgba(255,167,38,0.5)',
+        'rgba(171,71,188,0.5)',
+        'rgba(239,83,80,0.5)',
+      ],
+      borderWidth: 0,
+    }],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend:{ position:'bottom' } },
+    scales: {
+      r: { beginAtZero:true, grid:{ color:'rgba(76,175,80,0.06)' } },
+    },
+  },
+});
+
+// 6. Risk Assessment — Bar
+new Chart(document.getElementById('chart-risk'), {
+  type: 'bar',
+  data: {
+    labels: labels5,
+    datasets: [{
+      label: 'Risk Score (Confidence × Severity)',
+      data: [1.8, 3.6, 2.7, 6.5, 0],
+      backgroundColor: ['rgba(102,187,106,0.6)','rgba(66,165,245,0.6)','rgba(255,167,38,0.6)','rgba(239,83,80,0.6)','rgba(171,71,188,0.6)'],
+      borderRadius: 8,
+      borderSkipped: false,
+      barThickness: 36,
+    }],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend:{ display:false } },
+    scales: {
+      y: { beginAtZero:true, max:8, grid:{ color:'rgba(76,175,80,0.06)' },
+        title:{ display:true, text:'Risk Score', font:{weight:600} } },
+      x: { grid:{ display:false } },
+    },
+  },
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   CHART.JS — Model Performance
+   ═══════════════════════════════════════════════════════════════ */
+// Model comparison bar chart
+new Chart(document.getElementById('chart-model-compare'), {
+  type: 'bar',
+  data: {
+    labels: ['Accuracy','Precision','Recall','F1-Score'],
+    datasets: [
+      {
+        label: 'Custom CNN',
+        data: [82, 81, 80, 80],
+        backgroundColor: 'rgba(255,167,38,0.6)',
+        borderRadius: 6,
+        barThickness: 28,
+      },
+      {
+        label: 'MobileNetV2',
+        data: [94, 94, 93, 93],
+        backgroundColor: 'rgba(76,175,80,0.6)',
+        borderRadius: 6,
+        barThickness: 28,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: { legend:{ position:'bottom' } },
+    scales: {
+      y: { min:50, max:100, grid:{ color:'rgba(76,175,80,0.06)' },
+        title:{ display:true, text:'Percentage (%)', font:{weight:600} } },
+      x: { grid:{ display:false } },
+    },
+  },
+});
+
+// Efficiency comparison
+new Chart(document.getElementById('chart-efficiency'), {
+  type: 'bar',
+  data: {
+    labels: ['Model Size (MB)','Inference (ms)','Training (min)','Parameters (M)'],
+    datasets: [
+      {
+        label: 'Custom CNN',
+        data: [5, 50, 15, 1.2],
+        backgroundColor: 'rgba(255,167,38,0.5)',
+        borderRadius: 6,
+        barThickness: 24,
+      },
+      {
+        label: 'MobileNetV2',
+        data: [13, 200, 25, 2.6],
+        backgroundColor: 'rgba(76,175,80,0.5)',
+        borderRadius: 6,
+        barThickness: 24,
+      },
+    ],
+  },
+  options: {
+    responsive: true, indexAxis:'y',
+    plugins: { legend:{ position:'bottom' } },
+    scales: {
+      x: { beginAtZero:true, grid:{ color:'rgba(76,175,80,0.06)' } },
+      y: { grid:{ display:false } },
+    },
+  },
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PREDICT — File Handling & API Call
+   ═══════════════════════════════════════════════════════════════ */
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const previewImg = document.getElementById('preview-img');
 const dropContent = document.getElementById('drop-content');
 const analyzeBtn = document.getElementById('analyze-btn');
+const pdfBtn = document.getElementById('pdf-btn');
 const errorMsg = document.getElementById('error-msg');
 
 let selectedFile = null;
+let lastResult = null; // store for PDF generation
+
+// Medication map (client-side mirror for PDF)
+const MEDICATION_MAP = {
+  acne: [
+    { name:'Benzoyl Peroxide 2.5% gel', use:'Kills acne-causing bacteria, reduces inflammation' },
+    { name:'Salicylic Acid cleanser', use:'Unclogs pores, removes dead skin cells' },
+    { name:'Adapalene 0.1% gel (Differin)', use:'Retinoid that prevents new comedones' },
+  ],
+  eczema: [
+    { name:'1% Hydrocortisone cream', use:'Reduces itching and mild inflammation' },
+    { name:'Cerave Moisturising Cream', use:'Restores skin barrier with ceramides' },
+    { name:'Antihistamine (Loratadine 10mg)', use:'Reduces allergic itching' },
+  ],
+  fungal: [
+    { name:'Clotrimazole 1% cream', use:'Antifungal — apply twice daily for 4 weeks' },
+    { name:'Miconazole nitrate cream', use:'Broad-spectrum antifungal treatment' },
+    { name:'Terbinafine 1% cream (Lamisil AT)', use:'Highly effective for ringworm' },
+  ],
+  psoriasis: [
+    { name:'Coal Tar 2% cream', use:'Slows skin cell growth, reduces scaling' },
+    { name:'Salicylic Acid ointment', use:'Softens and removes plaques' },
+    { name:'1% Hydrocortisone cream', use:'Reduces redness and itch for mild cases' },
+  ],
+  normal: [
+    { name:'SPF 30+ sunscreen (daily)', use:'Prevents UV damage and premature ageing' },
+    { name:'Moisturiser with hyaluronic acid', use:'Maintains skin hydration and elasticity' },
+  ],
+};
 
 /* ── File Handling ── */
 dropZone.addEventListener('click', () => fileInput.click());
@@ -586,10 +1623,11 @@ function setState(state) {
   document.getElementById('diagnosis-output').style.display = state === 'result' ? 'block' : 'none';
 }
 
-/* ── Analyze — calls local FastAPI backend ── */
+/* ── Analyze — calls FastAPI backend ── */
 async function analyzeImage() {
   if (!selectedFile) return;
   analyzeBtn.disabled = true;
+  pdfBtn.style.display = 'none';
   hideError();
   setState('loading');
   document.getElementById('result-card').classList.remove('loaded');
@@ -609,6 +1647,7 @@ async function analyzeImage() {
     }
 
     const result = await response.json();
+    lastResult = result;
     renderResult(result);
   } catch (err) {
     setState('idle');
@@ -633,7 +1672,6 @@ function renderResult(r) {
   const qualityWarnings = r.quality_warnings || [];
   const topPredictions = r.top_predictions || [];
   const isReliable = r.is_reliable !== false;
-  const entropy = r.prediction_entropy || 0;
   const margin = r.prediction_margin || 100;
   const ttaUsed = r.tta_used || false;
   const ttaPasses = r.tta_passes || 0;
@@ -643,21 +1681,20 @@ function renderResult(r) {
   document.getElementById('d-condition').textContent = condition;
   document.getElementById('d-desc').textContent = description;
 
-  /* TTA metrics bar */
+  /* TTA metrics */
   const ttaMetrics = document.getElementById('d-tta-metrics');
   if (ttaUsed && ttaMetrics) {
     document.getElementById('d-tta-passes').textContent = ttaPasses;
     document.getElementById('d-tta-agree').textContent = ttaAgreement + '%';
     document.getElementById('d-tta-latency').textContent = ttaLatency + 'ms';
     ttaMetrics.style.display = 'block';
-    // Color the agreement based on value
     const agreeEl = document.getElementById('d-tta-agree');
     agreeEl.style.color = ttaAgreement >= 87.5 ? '#2a9d5c' : ttaAgreement >= 50 ? '#c09a15' : '#dc4747';
   } else if (ttaMetrics) {
     ttaMetrics.style.display = 'none';
   }
 
-  /* Confidence text — adapts to reliability */
+  /* Confidence text */
   const confLabel = document.getElementById('d-conf');
   const confPct = document.getElementById('d-conf-pct');
   if (isReliable) {
@@ -669,7 +1706,7 @@ function renderResult(r) {
     confPct.textContent = `${confidence}%`;
   }
 
-  /* Confidence bar — color reflects reliability */
+  /* Confidence bar */
   setTimeout(() => {
     const fill = document.getElementById('conf-fill');
     fill.style.width = confidence + '%';
@@ -684,11 +1721,10 @@ function renderResult(r) {
     }
   }, 100);
 
-  /* Reliability banner — shown when prediction is unreliable */
+  /* Quality / reliability warnings */
   const qualityEl = document.getElementById('d-quality');
   if (!isReliable || qualityWarnings.length > 0) {
     let html = '';
-
     if (!isReliable) {
       html += `<div style="padding:12px 16px;background:linear-gradient(135deg,#fef3cd,#fff3e0);border:1px solid #f0c040;border-radius:10px;margin-bottom:8px;font-weight:600;color:#856404">
         🛡️ <strong>Reliability Alert:</strong> This prediction may not be accurate.
@@ -696,11 +1732,9 @@ function renderResult(r) {
         Please consult a dermatologist for a professional diagnosis.
       </div>`;
     }
-
     qualityWarnings.forEach(w => {
       html += `<div style="padding:8px 12px;background:#fff8e1;border-left:3px solid #f0c040;border-radius:6px;margin-bottom:6px;color:#6b5900;font-size:0.92rem">⚠️ ${w}</div>`;
     });
-
     qualityEl.innerHTML = html;
     qualityEl.style.display = 'block';
   } else {
@@ -719,12 +1753,9 @@ function renderResult(r) {
   const sevClass = sevMap[severity] || 'sev-neutral';
   const sevShort = severity.includes('—') ? severity.split('—')[0].trim() : severity;
   tagsEl.innerHTML += `<span class="severity-tag ${sevClass}">⬤ ${sevShort}</span>`;
-
   if (r.specialist) {
     tagsEl.innerHTML += `<span class="severity-tag sev-neutral">👨‍⚕️ ${r.specialist}</span>`;
   }
-
-  /* Reliability badge */
   if (isReliable) {
     tagsEl.innerHTML += `<span class="severity-tag sev-low">✅ Reliable</span>`;
   } else {
@@ -762,12 +1793,251 @@ function renderResult(r) {
     topPredsSection.style.display = 'none';
   }
 
-  /* Recommendations as steps */
+  /* Medications */
+  const medsSection = document.getElementById('d-meds-section');
+  const medsEl = document.getElementById('d-meds');
+  const diseaseKey = (r.disease || '').trim().toLowerCase();
+  const meds = MEDICATION_MAP[diseaseKey] || [];
+  if (meds.length > 0) {
+    medsEl.innerHTML = meds.map(m =>
+      `<div class="med-item"><strong>${m.name}</strong> — ${m.use}</div>`
+    ).join('');
+    medsSection.style.display = 'block';
+  } else {
+    medsSection.style.display = 'none';
+  }
+
+  /* Recommendations */
   const stepsEl = document.getElementById('d-steps');
   stepsEl.innerHTML = '';
   recommendations.forEach((s, i) => {
     stepsEl.innerHTML += `<div class="step-item"><div class="step-num">${i+1}</div><div>${s}</div></div>`;
   });
+
+  /* Show PDF button */
+  pdfBtn.style.display = 'block';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PDF DOWNLOAD — jsPDF
+   ═══════════════════════════════════════════════════════════════ */
+function downloadPDF() {
+  if (!lastResult) {
+    alert('No diagnosis result available. Please analyze an image first.');
+    return;
+  }
+
+  try {
+    if (!window.jspdf) {
+      alert('PDF library is still loading. Please wait a moment and try again.');
+      return;
+    }
+
+    var jsPDFLib = window.jspdf.jsPDF;
+    var doc = new jsPDFLib('p', 'mm', 'a4');
+    var pw = doc.internal.pageSize.getWidth();
+    var ph = doc.internal.pageSize.getHeight();
+    var y = 15;
+
+    var r = lastResult;
+    var condition = r.display_name || r.disease || 'Unknown';
+    var confidence = Math.round((r.confidence || 0) * 100);
+    var description = r.description || '';
+    var severity = r.severity || 'Unknown';
+    var symptoms = r.symptoms || [];
+    var recommendations = r.recommendations || [];
+    var ttaAgreement = r.tta_agreement || 0;
+    var ttaPasses = r.tta_passes || 8;
+  var ttaLatency = r.latency_ms || 0;
+  var entropy = r.prediction_entropy || 0;
+  var specialist = r.specialist || 'Dermatologist';
+  var diseaseKey = (r.disease || '').trim().toLowerCase();
+  var meds = MEDICATION_MAP[diseaseKey] || [];
+
+  // Helper: sanitize text
+  function san(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/\u2014/g, '-').replace(/\u2013/g, '-')
+      .replace(/\u2018/g, "'").replace(/\u2019/g, "'")
+      .replace(/\u201c/g, '"').replace(/\u201d/g, '"')
+      .replace(/\u2022/g, '-').replace(/\u2026/g, '...')
+      .replace(/\u00a0/g, ' ').replace(/\u2192/g, '->');
+  }
+
+  // Helper: add page if needed
+  function checkPage(needed) {
+    if (y + needed > ph - 20) {
+      doc.addPage();
+      y = 15;
+    }
+  }
+
+  // ── Header ──
+  doc.setFillColor(76, 175, 80);
+  doc.rect(0, 0, pw, 3, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(27, 94, 32);
+  doc.text('Skin Disease Detection - AI Report', pw / 2, y + 5, { align: 'center' });
+  y += 14;
+
+  doc.setDrawColor(76, 175, 80);
+  doc.setLineWidth(0.5);
+  doc.line(15, y, pw - 15, y);
+  y += 8;
+
+  // ── Metadata ──
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })
+    + '  ' + now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  doc.text('Generated on: ' + dateStr, 15, y);
+  y += 5;
+  doc.text('Model: MobileNetV2 Transfer Learning + 8-Pass TTA', 15, y);
+  y += 10;
+
+  // ── Prediction Result ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(76, 175, 80);
+  doc.text('Prediction Result', 15, y);
+  y += 8;
+
+  function addField(label, value) {
+    checkPage(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(label + ':', 15, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(san(value), 65, y);
+    y += 7;
+  }
+
+  addField('Detected Condition', condition);
+  addField('Confidence', confidence + '%');
+  addField('Severity', severity);
+  addField('Specialist', specialist);
+  addField('TTA Agreement', ttaAgreement + '%');
+  addField('TTA Passes', String(ttaPasses));
+  addField('Prediction Entropy', entropy.toFixed(4));
+  addField('Inference Latency', Math.round(ttaLatency) + ' ms');
+  y += 4;
+
+  // ── Description ──
+  checkPage(20);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(76, 175, 80);
+  doc.text('Description', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  var descLines = doc.splitTextToSize(san(description), pw - 30);
+  doc.text(descLines, 15, y);
+  y += descLines.length * 5 + 6;
+
+  // ── Symptoms ──
+  if (symptoms.length > 0) {
+    checkPage(15);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(76, 175, 80);
+    doc.text('Common Symptoms', 15, y);
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    symptoms.forEach(function(s) {
+      checkPage(7);
+      doc.text('  - ' + san(s), 18, y);
+      y += 5.5;
+    });
+    y += 4;
+  }
+
+  // ── Recommendations ──
+  if (recommendations.length > 0) {
+    checkPage(15);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(76, 175, 80);
+    doc.text('Recommendations', 15, y);
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    recommendations.forEach(function(rec) {
+      checkPage(7);
+      var lines = doc.splitTextToSize('  - ' + san(rec), pw - 35);
+      doc.text(lines, 18, y);
+      y += lines.length * 5 + 1;
+    });
+    y += 4;
+  }
+
+  // ── Medications ──
+  if (meds.length > 0) {
+    checkPage(15);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(76, 175, 80);
+    doc.text('Suggested OTC Medications', 15, y);
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    meds.forEach(function(m) {
+      checkPage(7);
+      var mText = '  - ' + san(m.name) + ' -- ' + san(m.use);
+      var lines = doc.splitTextToSize(mText, pw - 35);
+      doc.text(lines, 18, y);
+      y += lines.length * 5 + 1;
+    });
+    y += 4;
+  }
+
+  // ── Disclaimer ──
+  checkPage(30);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(200, 50, 50);
+  doc.text('MEDICAL DISCLAIMER', 15, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  var discText = 'This report is generated by an AI-assisted screening tool for educational '
+    + 'and informational purposes ONLY. It is NOT a substitute for professional '
+    + 'medical advice, diagnosis, or treatment. Always consult a qualified '
+    + 'dermatologist before taking any medication or starting any treatment. '
+    + 'Do not disregard professional medical advice based on this report.';
+  var discLines2 = doc.splitTextToSize(discText, pw - 30);
+  doc.text(discLines2, 15, y);
+  y += discLines2.length * 4.5 + 6;
+
+  // ── Footer line ──
+  doc.setDrawColor(76, 175, 80);
+  doc.setLineWidth(0.3);
+  doc.line(15, ph - 12, pw - 15, ph - 12);
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Skin Disease Detection Using Deep Learning', pw / 2, ph - 7, { align:'center' });
+
+  // ── Save ──
+  var safeName = condition.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+  doc.save('Skin_Disease_Report_' + safeName + '.pdf');
+
+  } catch (err) {
+    console.error('PDF generation error:', err);
+    alert('Error generating PDF: ' + err.message + '. Please try again.');
+  }
 }
 </script>
 </body>

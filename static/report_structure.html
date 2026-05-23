@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B.Tech Mini Project Report Structure — Skin Disease Detection Using Deep Learning</title>
+<meta name="description" content="Professional B.Tech mini project report structure for Skin Disease Detection Using Deep Learning">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   B.TECH REPORT STRUCTURE — Professional Academic Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg: #f5fdf6;
+  --accent: #4CAF50;
+  --accent2: #66BB6A;
+  --accent3: #2E7D32;
+  --accent4: #1B5E20;
+  --glass: rgba(255,255,255,0.88);
+  --border: rgba(76,175,80,0.15);
+  --border2: rgba(76,175,80,0.25);
+  --text: #1B5E20;
+  --text2: #33691E;
+  --text3: #689F38;
+  --shadow: rgba(76,175,80,0.06);
+  --shadow2: rgba(76,175,80,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: linear-gradient(135deg, #f5fdf6 0%, #ffffff 50%, #e8f5e9 100%);
+  color: #1a1a2e;
+  min-height:100vh;
+}
+
+/* ── Ambient orbs ── */
+.orb {
+  position:fixed; border-radius:50%; filter:blur(100px);
+  pointer-events:none; z-index:0;
+  animation: orb-drift 14s ease-in-out infinite alternate;
+}
+.orb1{width:400px;height:400px;background:radial-gradient(circle,rgba(76,175,80,0.1),transparent 70%);top:-100px;left:-100px}
+.orb2{width:350px;height:350px;background:radial-gradient(circle,rgba(129,199,132,0.08),transparent 70%);bottom:-80px;right:-80px;animation-delay:-5s}
+@keyframes orb-drift{from{transform:translate(0,0) scale(1)}to{transform:translate(20px,-15px) scale(1.05)}}
+
+body::before {
+  content:''; position:fixed; inset:0; z-index:0;
+  background-image: radial-gradient(circle, rgba(76,175,80,0.04) 1px, transparent 1px);
+  background-size: 28px 28px; pointer-events:none;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:64px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 32px;
+}
+.top-bar-title {
+  font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+  color:var(--text); display:flex; align-items:center; gap:8px;
+}
+.top-bar-dot {
+  width:8px; height:8px; background:var(--accent);
+  border-radius:50%; box-shadow:0 0 6px rgba(76,175,80,0.4);
+}
+.top-bar-actions { display:flex; gap:10px; }
+.btn-back, .btn-download {
+  padding:8px 20px; border-radius:10px; font-size:13px;
+  font-weight:600; cursor:pointer; border:none;
+  transition:all 0.3s ease; font-family:'DM Sans',sans-serif;
+}
+.btn-back {
+  background:rgba(76,175,80,0.08); color:var(--accent3);
+  border:1px solid var(--border2);
+}
+.btn-back:hover { background:rgba(76,175,80,0.15); }
+.btn-download {
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; box-shadow:0 4px 14px rgba(76,175,80,0.25);
+}
+.btn-download:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(76,175,80,0.3); }
+
+/* ── Main container ── */
+.report-container {
+  position:relative; z-index:1;
+  max-width:900px; margin:0 auto;
+  padding:88px 24px 60px;
+}
+
+/* ── Report paper ── */
+.paper {
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  backdrop-filter:blur(16px);
+  padding:52px 48px;
+  box-shadow:0 8px 40px var(--shadow2);
+  position:relative; overflow:hidden;
+}
+.paper::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 50%);
+  pointer-events:none;
+}
+@media(max-width:600px){ .paper { padding:28px 20px; } }
+
+/* ── Report title ── */
+.report-title {
+  text-align:center; margin-bottom:40px; padding-bottom:28px;
+  border-bottom:2px solid var(--border2); position:relative;
+}
+.report-title h1 {
+  font-family:'Syne',sans-serif; font-size:clamp(22px,3.5vw,32px);
+  font-weight:800; color:var(--text); letter-spacing:-0.5px;
+  margin-bottom:8px; line-height:1.3;
+}
+.report-title .subtitle {
+  font-size:14px; color:var(--text3); font-weight:500;
+}
+.report-title .badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:600; letter-spacing:1px;
+  color:var(--accent); text-transform:uppercase;
+  background:rgba(76,175,80,0.08); border:1px solid var(--border);
+  padding:5px 14px; border-radius:99px; margin-bottom:16px;
+}
+
+/* ── Page distribution ── */
+.page-dist {
+  background:rgba(76,175,80,0.04); border:1px solid var(--border);
+  border-radius:14px; padding:20px 24px; margin-bottom:32px;
+}
+.page-dist h3 {
+  font-family:'Syne',sans-serif; font-size:14px; font-weight:700;
+  color:var(--accent3); margin-bottom:12px;
+}
+.page-dist-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:8px;
+}
+.page-dist-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:6px 10px; border-radius:8px;
+  font-size:12px; color:var(--text2);
+  background:rgba(255,255,255,0.6);
+}
+.page-dist-item strong { color:var(--accent3); font-weight:600; }
+
+/* ── Chapter headings ── */
+.chapter {
+  margin-bottom:32px; padding-top:8px;
+}
+.chapter-num {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  color:var(--accent); text-transform:uppercase; letter-spacing:1.5px;
+  margin-bottom:6px;
+}
+.chapter h2 {
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+  color:var(--text); letter-spacing:-0.3px; margin-bottom:6px;
+  padding-bottom:10px; border-bottom:1px solid var(--border);
+}
+.chapter .page-range {
+  font-size:11px; color:var(--text3); font-weight:500;
+  margin-bottom:16px; font-style:italic;
+}
+
+/* ── Section items ── */
+.section-item {
+  padding:8px 0 8px 18px; position:relative;
+  border-left:2px solid rgba(76,175,80,0.12);
+  margin-bottom:4px;
+}
+.section-item::before {
+  content:''; position:absolute; left:-5px; top:14px;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--accent); opacity:0.4;
+}
+.section-num {
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+  color:var(--accent3); display:inline;
+}
+.section-title {
+  font-size:14px; font-weight:500; color:var(--text2); display:inline; margin-left:6px;
+}
+.section-desc {
+  font-size:12px; color:var(--text3); margin-top:3px; line-height:1.6;
+  font-style:italic; padding-left:2px;
+}
+
+/* ── Sub-sections (nested) ── */
+.subsections {
+  margin:6px 0 4px 22px;
+}
+.subsection-item {
+  font-size:12px; color:var(--text3); padding:3px 0;
+  display:flex; align-items:flex-start; gap:6px;
+}
+.subsection-item::before {
+  content:'–'; color:var(--accent); font-weight:700; flex-shrink:0;
+}
+
+/* ── Placeholder boxes ── */
+.placeholder-box {
+  background:rgba(76,175,80,0.04); border:1.5px dashed var(--border2);
+  border-radius:12px; padding:14px 18px; margin:10px 0 10px 20px;
+  font-size:12px; color:var(--text3); display:flex;
+  align-items:center; gap:10px;
+}
+.placeholder-box .icon {
+  width:32px; height:32px; border-radius:8px;
+  background:rgba(76,175,80,0.1); display:flex;
+  align-items:center; justify-content:center; font-size:16px;
+  flex-shrink:0;
+}
+
+/* ── Table placeholder ── */
+.table-placeholder {
+  width:100%; border-collapse:collapse; margin:12px 0;
+  font-size:12px; border-radius:10px; overflow:hidden;
+  border:1px solid var(--border);
+}
+.table-placeholder th {
+  background:rgba(76,175,80,0.08); padding:10px 14px;
+  text-align:left; font-weight:600; color:var(--accent3);
+  font-size:11px; text-transform:uppercase; letter-spacing:0.5px;
+}
+.table-placeholder td {
+  padding:8px 14px; border-bottom:1px solid rgba(76,175,80,0.06);
+  color:var(--text3); font-style:italic;
+}
+.table-placeholder tr:last-child td { border-bottom:none; }
+
+/* ── Format guide ── */
+.format-guide {
+  background:rgba(76,175,80,0.04); border:1px solid var(--border);
+  border-radius:14px; padding:20px 24px; margin:24px 0;
+}
+.format-guide h4 {
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+  color:var(--accent3); margin-bottom:10px;
+}
+.format-guide ul { list-style:none; }
+.format-guide li {
+  font-size:12px; color:var(--text2); padding:4px 0;
+  display:flex; align-items:flex-start; gap:8px; line-height:1.5;
+}
+.format-guide li::before { content:'◆'; color:var(--accent); font-size:8px; margin-top:4px; }
+
+/* ── Reference format ── */
+.ref-item {
+  font-size:12px; color:var(--text3); padding:6px 0 6px 18px;
+  border-left:2px solid rgba(76,175,80,0.1);
+  margin-bottom:4px; font-style:italic; line-height:1.6;
+}
+.ref-num {
+  font-weight:700; color:var(--accent3); font-style:normal;
+}
+
+/* ── Dividers ── */
+.chapter-divider {
+  height:1px; border:none; margin:8px 0 24px;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+}
+
+/* ── Footer ── */
+.report-footer {
+  text-align:center; margin-top:40px; padding-top:20px;
+  border-top:1px solid var(--border); font-size:11px;
+  color:var(--text3);
+}
+
+/* ── Print styles ── */
+@media print {
+  .top-bar { display:none; }
+  .orb, body::before { display:none; }
+  body { background:white; }
+  .report-container { padding:0; }
+  .paper { box-shadow:none; border:none; border-radius:0; padding:20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-title">
+    <div class="top-bar-dot"></div>
+    B.Tech Report Structure
+  </div>
+  <div class="top-bar-actions">
+    <button class="btn-back" onclick="window.location.href='/static/index.html'">← Back to App</button>
+    <button class="btn-download" onclick="downloadReportPDF()">📥 Download as PDF</button>
+  </div>
+</div>
+
+<div class="report-container">
+<div class="paper">
+
+<!-- ═══════════════════════════════════════════════════════════
+     REPORT TITLE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="report-title">
+  <div class="badge">📋 Report Template</div>
+  <h1>SKIN DISEASE DETECTION<br>USING DEEP LEARNING</h1>
+  <div class="subtitle">B.Tech Mini Project Report Structure · Computer Science & Engineering</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ESTIMATED PAGE DISTRIBUTION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="page-dist">
+  <h3>📄 Estimated Page Distribution (Total: ~60–75 pages)</h3>
+  <div class="page-dist-grid">
+    <div class="page-dist-item">Abstract <strong>1–2</strong></div>
+    <div class="page-dist-item">TOC + Lists <strong>2–3</strong></div>
+    <div class="page-dist-item">Ch.1 Introduction <strong>5–7</strong></div>
+    <div class="page-dist-item">Ch.2 Lit. Survey <strong>8–10</strong></div>
+    <div class="page-dist-item">Ch.3 Proposed Sys <strong>6–8</strong></div>
+    <div class="page-dist-item">Ch.4 Requirements <strong>3–4</strong></div>
+    <div class="page-dist-item">Ch.5 Design <strong>7–9</strong></div>
+    <div class="page-dist-item">Ch.6 Implement. <strong>10–14</strong></div>
+    <div class="page-dist-item">Ch.7 Testing <strong>6–8</strong></div>
+    <div class="page-dist-item">Ch.8 Conclusion <strong>3–4</strong></div>
+    <div class="page-dist-item">Ch.9 Appendix <strong>5–8</strong></div>
+    <div class="page-dist-item">References <strong>2–3</strong></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Preliminary</div>
+  <h2>TABLE OF CONTENTS</h2>
+  <div class="page-range">Pages i–iii</div>
+
+  <table class="table-placeholder">
+    <thead>
+      <tr><th>Chapter / Section</th><th>Page No.</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Abstract</td><td>i</td></tr>
+      <tr><td>List of Abbreviations</td><td>ii</td></tr>
+      <tr><td>List of Figures</td><td>iii</td></tr>
+      <tr><td>List of Tables</td><td>iv</td></tr>
+      <tr><td>Chapter 1 — Introduction</td><td>1</td></tr>
+      <tr><td>&emsp;1.1 About the Project</td><td>1</td></tr>
+      <tr><td>&emsp;1.2 Goals/Objectives</td><td>2</td></tr>
+      <tr><td>&emsp;1.3 Problem Statement</td><td>3</td></tr>
+      <tr><td>&emsp;1.4 Background Study</td><td>4</td></tr>
+      <tr><td>&emsp;1.5 Scope of the Project</td><td>5</td></tr>
+      <tr><td>&emsp;1.6 Motivation</td><td>6</td></tr>
+      <tr><td>Chapter 2 — Literature Survey</td><td>8</td></tr>
+      <tr><td>Chapter 3 — Proposed System</td><td>18</td></tr>
+      <tr><td>Chapter 4 — System Requirements</td><td>26</td></tr>
+      <tr><td>Chapter 5 — System Design</td><td>30</td></tr>
+      <tr><td>Chapter 6 — Implementation</td><td>39</td></tr>
+      <tr><td>Chapter 7 — Testing</td><td>53</td></tr>
+      <tr><td>Chapter 8 — Conclusion & Future Enhancements</td><td>61</td></tr>
+      <tr><td>Chapter 9 — Appendix</td><td>65</td></tr>
+      <tr><td>References</td><td>73</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABSTRACT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Preliminary</div>
+  <h2>ABSTRACT</h2>
+  <div class="page-range">Pages i (1 page)</div>
+
+  <div class="section-desc" style="margin-left:0; padding-left:0; font-size:13px; line-height:1.8;">
+    The abstract should concisely cover the following in 200–300 words:
+  </div>
+  <div class="subsections" style="margin-left:0">
+    <div class="subsection-item">Project motivation and problem context (skin disease prevalence, diagnostic gaps)</div>
+    <div class="subsection-item">Objective of the system (AI-powered skin disease detection)</div>
+    <div class="subsection-item">Methodology used (MobileNetV2 transfer learning, TTA, Grad-CAM++)</div>
+    <div class="subsection-item">Dataset description (5 classes, training/validation split)</div>
+    <div class="subsection-item">Key results (accuracy achieved, confidence metrics)</div>
+    <div class="subsection-item">Conclusion summary (tool for preliminary screening, not replacement for dermatologist)</div>
+    <div class="subsection-item">Keywords: Deep Learning, CNN, MobileNetV2, Transfer Learning, Skin Disease, Dermatology, TTA</div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     LIST OF ABBREVIATIONS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Preliminary</div>
+  <h2>LIST OF ABBREVIATIONS</h2>
+  <div class="page-range">Page ii</div>
+
+  <table class="table-placeholder">
+    <thead><tr><th>Abbreviation</th><th>Full Form</th></tr></thead>
+    <tbody>
+      <tr><td>AI</td><td>Artificial Intelligence</td></tr>
+      <tr><td>CNN</td><td>Convolutional Neural Network</td></tr>
+      <tr><td>DL</td><td>Deep Learning</td></tr>
+      <tr><td>ML</td><td>Machine Learning</td></tr>
+      <tr><td>TL</td><td>Transfer Learning</td></tr>
+      <tr><td>TTA</td><td>Test-Time Augmentation</td></tr>
+      <tr><td>GAP</td><td>Global Average Pooling</td></tr>
+      <tr><td>Grad-CAM</td><td>Gradient-weighted Class Activation Mapping</td></tr>
+      <tr><td>OOD</td><td>Out-of-Distribution</td></tr>
+      <tr><td>API</td><td>Application Programming Interface</td></tr>
+      <tr><td>REST</td><td>Representational State Transfer</td></tr>
+      <tr><td>GUI</td><td>Graphical User Interface</td></tr>
+      <tr><td>OTC</td><td>Over-the-Counter</td></tr>
+      <tr><td>PDF</td><td>Portable Document Format</td></tr>
+      <tr><td>RGB</td><td>Red Green Blue</td></tr>
+      <tr><td>ReLU</td><td>Rectified Linear Unit</td></tr>
+      <tr><td>SGD</td><td>Stochastic Gradient Descent</td></tr>
+      <tr><td>GPU</td><td>Graphics Processing Unit</td></tr>
+      <tr><td>CORS</td><td>Cross-Origin Resource Sharing</td></tr>
+      <tr><td>JSON</td><td>JavaScript Object Notation</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 1: INTRODUCTION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 1</div>
+  <h2>INTRODUCTION</h2>
+  <div class="page-range">Pages 1–7 (~6 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">1.1</span>
+    <span class="section-title">About the Project</span>
+    <div class="section-desc">Introduce the project — AI-based skin disease detection using deep learning. Describe the system's purpose, target users (patients, healthcare workers), and deployment modes (Streamlit, FastAPI web app).</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">1.2</span>
+    <span class="section-title">Goals and Objectives</span>
+    <div class="section-desc">List 5–7 specific, measurable objectives of the project. E.g., "Achieve ≥90% classification accuracy on 5 skin disease classes using transfer learning."</div>
+    <div class="subsections">
+      <div class="subsection-item">Primary objectives (classification accuracy, user interface, explainability)</div>
+      <div class="subsection-item">Secondary objectives (PDF report generation, API endpoint, OOD detection)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">1.3</span>
+    <span class="section-title">Problem Statement</span>
+    <div class="section-desc">Define the problem: high prevalence of skin diseases, shortage of dermatologists, delayed diagnosis in rural areas, need for accessible AI screening tools.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">1.4</span>
+    <span class="section-title">Background Study</span>
+    <div class="section-desc">Cover the evolution of computer-aided diagnosis, introduction of CNNs in medical imaging, rise of transfer learning, and current state-of-the-art in dermatological AI.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">1.5</span>
+    <span class="section-title">Scope of the Project</span>
+    <div class="section-desc">Define what the project covers and what it doesn't. 5 disease classes (Acne, Eczema, Fungal, Psoriasis, Normal). Educational/informational tool, not a medical device.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">1.6</span>
+    <span class="section-title">Motivation</span>
+    <div class="section-desc">Explain why this project matters — WHO statistics on skin diseases, cost of misdiagnosis, potential of AI to bridge healthcare gaps.</div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 2: LITERATURE SURVEY
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 2</div>
+  <h2>LITERATURE SURVEY</h2>
+  <div class="page-range">Pages 8–17 (~10 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">2.1</span>
+    <span class="section-title">Existing Skin Disease Detection Systems</span>
+    <div class="section-desc">Survey existing commercial and research systems (e.g., DermAssist, SkinVision, FirstDerm). Discuss their capabilities, limitations, and target audience.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">2.2</span>
+    <span class="section-title">Traditional Image Processing Approaches</span>
+    <div class="section-desc">Cover classical methods: histogram analysis, edge detection, color space segmentation, texture features (GLCM, LBP), SVM/Random Forest classifiers.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">2.3</span>
+    <span class="section-title">Deep Learning Approaches</span>
+    <div class="section-desc">Review deep learning evolution: AlexNet → VGG → ResNet → MobileNet. Explain how CNNs learn hierarchical features. Discuss transfer learning benefits for medical imaging.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">2.4</span>
+    <span class="section-title">CNN-based Disease Classification</span>
+    <div class="section-desc">Detail CNN architectures used in skin disease classification. Cover MobileNetV2 architecture specifically — inverted residuals, depthwise separable convolutions, bottleneck design.</div>
+    <div class="placeholder-box">
+      <div class="icon">📊</div>
+      <div><strong>Figure 2.1:</strong> MobileNetV2 Architecture Block Diagram</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">2.5</span>
+    <span class="section-title">Related Research Papers</span>
+    <div class="section-desc">Summarize 8–12 related research papers with year, authors, methodology, dataset used, and accuracy achieved. Include proper IEEE citations.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">2.6</span>
+    <span class="section-title">Comparative Analysis of Existing Work</span>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 2.1:</strong> Comparative Analysis of Related Work</div>
+    </div>
+    <table class="table-placeholder" style="margin-left:20px">
+      <thead><tr><th>Ref.</th><th>Authors (Year)</th><th>Method</th><th>Dataset</th><th>Classes</th><th>Accuracy</th></tr></thead>
+      <tbody>
+        <tr><td>[1]</td><td><em>Author et al. (Year)</em></td><td><em>CNN type</em></td><td><em>Dataset name</em></td><td><em>N</em></td><td><em>XX%</em></td></tr>
+        <tr><td>[2]</td><td><em>Author et al. (Year)</em></td><td><em>CNN type</em></td><td><em>Dataset name</em></td><td><em>N</em></td><td><em>XX%</em></td></tr>
+        <tr><td>...</td><td><em>...</em></td><td><em>...</em></td><td><em>...</em></td><td><em>...</em></td><td><em>...</em></td></tr>
+        <tr><td>Ours</td><td><em>Present Work</em></td><td>MobileNetV2 + TTA</td><td><em>Custom (5 classes)</em></td><td>5</td><td>~92–96%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 3: PROPOSED SYSTEM
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 3</div>
+  <h2>PROPOSED SYSTEM</h2>
+  <div class="page-range">Pages 18–25 (~8 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">3.1</span>
+    <span class="section-title">Proposed Architecture</span>
+    <div class="section-desc">Describe the end-to-end system: Image Input → Preprocessing → OOD Detection → MobileNetV2 Inference → TTA → Reliability Analysis → Diagnosis Output → PDF Report.</div>
+    <div class="placeholder-box">
+      <div class="icon">🏗️</div>
+      <div><strong>Figure 3.1:</strong> High-Level System Architecture Diagram</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.2</span>
+    <span class="section-title">Workflow</span>
+    <div class="section-desc">Step-by-step workflow from image upload to diagnosis. Include both Streamlit (app.py) and FastAPI (api.py) pathways.</div>
+    <div class="placeholder-box">
+      <div class="icon">🔄</div>
+      <div><strong>Figure 3.2:</strong> System Workflow / Activity Diagram</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.3</span>
+    <span class="section-title">Dataset Overview</span>
+    <div class="section-desc">Describe the dataset: 5 classes (Acne, Eczema, Fungal, Psoriasis, Normal), number of images per class, image dimensions, preprocessing applied, train/validation split ratio.</div>
+    <div class="placeholder-box">
+      <div class="icon">📊</div>
+      <div><strong>Table 3.1:</strong> Dataset Distribution per Class</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖼️</div>
+      <div><strong>Figure 3.3:</strong> Sample Images from Each Disease Class</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.4</span>
+    <span class="section-title">Model Selection</span>
+    <div class="section-desc">Justify the selection of MobileNetV2 over Custom CNN and other architectures. Compare parameters, accuracy, inference speed, and suitability for mobile/web deployment.</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 3.2:</strong> Custom CNN vs MobileNetV2 Comparison</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.5</span>
+    <span class="section-title">Advantages of Proposed System</span>
+    <div class="section-desc">List advantages: 8-pass TTA for robust predictions, Grad-CAM++ explainability, OOD detection, image quality checks, reliability scoring, PDF report generation, dual UI (Streamlit + Web).</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.6</span>
+    <span class="section-title">Use Case Diagram</span>
+    <div class="placeholder-box">
+      <div class="icon">👤</div>
+      <div><strong>Figure 3.4:</strong> UML Use Case Diagram (Actors: Patient, System, Dermatologist)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">3.7</span>
+    <span class="section-title">Architecture Diagram</span>
+    <div class="placeholder-box">
+      <div class="icon">🧠</div>
+      <div><strong>Figure 3.5:</strong> MobileNetV2 Transfer Learning Architecture (with custom head: GAP → Dense(256) → Softmax(5))</div>
+    </div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 4: SYSTEM REQUIREMENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 4</div>
+  <h2>SYSTEM REQUIREMENTS</h2>
+  <div class="page-range">Pages 26–29 (~4 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">4.1</span>
+    <span class="section-title">Software Requirements</span>
+    <table class="table-placeholder" style="margin-left:20px">
+      <thead><tr><th>Software</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Python</td><td>3.10+</td><td>Core programming language</td></tr>
+        <tr><td>TensorFlow / Keras</td><td>2.x</td><td>Deep learning framework</td></tr>
+        <tr><td>FastAPI</td><td>0.100+</td><td>REST API backend</td></tr>
+        <tr><td>Streamlit</td><td>1.x</td><td>Interactive dashboard UI</td></tr>
+        <tr><td>NumPy / Pillow / OpenCV</td><td>Latest</td><td>Image processing</td></tr>
+        <tr><td>Chart.js / jsPDF</td><td>4.x / 2.x</td><td>Frontend charts & PDF</td></tr>
+        <tr><td>VS Code / PyCharm</td><td>Latest</td><td>Development IDE</td></tr>
+        <tr><td>Git / GitHub</td><td>Latest</td><td>Version control</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">4.2</span>
+    <span class="section-title">Hardware Requirements</span>
+    <table class="table-placeholder" style="margin-left:20px">
+      <thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead>
+      <tbody>
+        <tr><td>Processor</td><td>Intel i5 / AMD Ryzen 5</td><td>Intel i7 / AMD Ryzen 7</td></tr>
+        <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+        <tr><td>GPU</td><td>Not required (CPU inference)</td><td>NVIDIA GPU with CUDA (for training)</td></tr>
+        <tr><td>Storage</td><td>5 GB free</td><td>20 GB SSD</td></tr>
+        <tr><td>Internet</td><td>Required for initial setup</td><td>Broadband for deployment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">4.3</span>
+    <span class="section-title">Functional Requirements</span>
+    <div class="subsections">
+      <div class="subsection-item">FR-01: System shall accept skin images in JPG/PNG format (max 10 MB)</div>
+      <div class="subsection-item">FR-02: System shall classify images into 5 disease categories</div>
+      <div class="subsection-item">FR-03: System shall display confidence score and severity assessment</div>
+      <div class="subsection-item">FR-04: System shall generate Grad-CAM++ heatmap overlays</div>
+      <div class="subsection-item">FR-05: System shall perform 8-pass TTA for robust predictions</div>
+      <div class="subsection-item">FR-06: System shall detect non-skin images (OOD detection)</div>
+      <div class="subsection-item">FR-07: System shall generate downloadable PDF clinical reports</div>
+      <div class="subsection-item">FR-08: System shall provide REST API endpoints for integration</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">4.4</span>
+    <span class="section-title">Non-Functional Requirements</span>
+    <div class="subsections">
+      <div class="subsection-item">NFR-01: Inference latency shall be under 3 seconds per image</div>
+      <div class="subsection-item">NFR-02: System shall be responsive across desktop and mobile devices</div>
+      <div class="subsection-item">NFR-03: API shall support rate limiting (15 requests/minute)</div>
+      <div class="subsection-item">NFR-04: System shall validate image file integrity (magic bytes check)</div>
+      <div class="subsection-item">NFR-05: System shall display medical disclaimer on all outputs</div>
+    </div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 5: SYSTEM DESIGN
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 5</div>
+  <h2>SYSTEM DESIGN</h2>
+  <div class="page-range">Pages 30–38 (~9 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">5.1</span>
+    <span class="section-title">Design Principles</span>
+    <div class="section-desc">Modularity, separation of concerns, single responsibility. Each module (preprocess, predict, explainability, disease_info) is independently testable.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.2</span>
+    <span class="section-title">Data Flow Diagram</span>
+    <div class="placeholder-box">
+      <div class="icon">🔄</div>
+      <div><strong>Figure 5.1:</strong> Level-0 DFD (Context Diagram)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🔄</div>
+      <div><strong>Figure 5.2:</strong> Level-1 DFD (Detailed Data Flow)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.3</span>
+    <span class="section-title">Module Design</span>
+    <div class="section-desc">Describe each Python module and its responsibilities:</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 5.1:</strong> Module Breakdown (preprocess.py, predict.py, train_model.py, explainability.py, api.py, app.py, utils/*)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.4</span>
+    <span class="section-title">Dataset Processing Flow</span>
+    <div class="section-desc">Data pipeline: Raw images → Resize (224×224) → Normalization → Augmentation (rotation, flip, zoom) → Train/Validation split.</div>
+    <div class="placeholder-box">
+      <div class="icon">🖼️</div>
+      <div><strong>Figure 5.3:</strong> Image Preprocessing Pipeline Diagram</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.5</span>
+    <span class="section-title">Model Training Pipeline</span>
+    <div class="section-desc">Training phases: Phase 1 (Feature extraction, frozen backbone, 20 epochs) → Phase 2 (Fine-tuning, unfrozen layers, 10 epochs). Include loss/accuracy curves.</div>
+    <div class="placeholder-box">
+      <div class="icon">📈</div>
+      <div><strong>Figure 5.4:</strong> Training & Validation Accuracy Curves</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📉</div>
+      <div><strong>Figure 5.5:</strong> Training & Validation Loss Curves</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.6</span>
+    <span class="section-title">UML Diagrams</span>
+    <div class="placeholder-box">
+      <div class="icon">📐</div>
+      <div><strong>Figure 5.6:</strong> Class Diagram (key Python classes and their relationships)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📐</div>
+      <div><strong>Figure 5.7:</strong> Sequence Diagram (image upload → prediction → result display)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📐</div>
+      <div><strong>Figure 5.8:</strong> Deployment Diagram (client browser ↔ FastAPI ↔ TensorFlow model)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">5.7</span>
+    <span class="section-title">Storage Design</span>
+    <div class="section-desc">No traditional database — model weights stored as .h5 file, disease metadata in Python dictionaries, temporary files for inference.</div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 6: IMPLEMENTATION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 6</div>
+  <h2>IMPLEMENTATION</h2>
+  <div class="page-range">Pages 39–52 (~14 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">6.1</span>
+    <span class="section-title">Development Environment</span>
+    <div class="section-desc">IDE setup, Python virtual environment, pip dependencies (requirements.txt), project directory structure.</div>
+    <div class="placeholder-box">
+      <div class="icon">📁</div>
+      <div><strong>Figure 6.1:</strong> Project Directory Structure Tree</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.2</span>
+    <span class="section-title">Dataset Collection</span>
+    <div class="section-desc">Source of dataset, data cleaning process, class balance analysis, sample image display.</div>
+    <div class="placeholder-box">
+      <div class="icon">🖼️</div>
+      <div><strong>Figure 6.2:</strong> Sample Dataset Images (5 classes × 3 samples each)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.3</span>
+    <span class="section-title">Image Preprocessing (preprocess.py)</span>
+    <div class="section-desc">Implementation of image loading, resizing to 224×224, pixel normalization (0–1), augmentation transforms.</div>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.1:</strong> Key preprocessing functions from preprocess.py</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.4</span>
+    <span class="section-title">CNN Model Implementation (train_model.py)</span>
+    <div class="section-desc">Model building: MobileNetV2 base loading, custom classification head (GAP → Dense(256, ReLU) → Dropout → Softmax(5)), compilation, callbacks (EarlyStopping, ReduceLROnPlateau).</div>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.2:</strong> Model architecture definition from train_model.py</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 6.1:</strong> Model Summary (layer names, output shapes, parameters)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.5</span>
+    <span class="section-title">Training and Validation</span>
+    <div class="section-desc">Training configuration: optimizer (Adam), learning rate schedule, batch size, epochs. Include training logs and convergence analysis.</div>
+    <div class="placeholder-box">
+      <div class="icon">📈</div>
+      <div><strong>Figure 6.3:</strong> Training History — Accuracy & Loss Plots (Phase 1 + Phase 2)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.6</span>
+    <span class="section-title">Prediction Module (predict.py)</span>
+    <div class="section-desc">Implementation of single-image prediction, 8-pass TTA (flip, rotate, brightness, zoom), reliability analysis (entropy, margin, TTA disagreement).</div>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.3:</strong> TTA prediction pipeline from predict.py</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.7</span>
+    <span class="section-title">Web Application — GUI Implementation</span>
+    <div class="section-desc">Dual-interface implementation: (a) Streamlit dashboard (app.py) and (b) FastAPI + HTML/JS frontend (api.py + static/index.html). Cover: file upload, result rendering, Grad-CAM display, PDF download, Chart.js visualizations.</div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 6.4:</strong> Screenshot — Streamlit Dashboard (Home page)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 6.5:</strong> Screenshot — Web UI (Home section with hero)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 6.6:</strong> Screenshot — Web UI (Data Analysis charts)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 6.7:</strong> Screenshot — Web UI (Model Performance comparison)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 6.8:</strong> Screenshot — Web UI (Prediction result with diagnosis)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📄</div>
+      <div><strong>Figure 6.9:</strong> Screenshot — Generated PDF Report</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.8</span>
+    <span class="section-title">Explainability Module (explainability.py)</span>
+    <div class="section-desc">Grad-CAM++ implementation for visual explanation of model predictions. Overlay generation on original image.</div>
+    <div class="placeholder-box">
+      <div class="icon">🔥</div>
+      <div><strong>Figure 6.10:</strong> Grad-CAM++ Heatmap Examples (Original vs Heatmap for each disease)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">6.9</span>
+    <span class="section-title">Additional Code Snippets</span>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.4:</strong> OOD Detection (ood_detector.py) — skin pixel ratio calculation</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.5:</strong> FastAPI /predict/web endpoint (api.py)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">💻</div>
+      <div><strong>Code Snippet 6.6:</strong> PDF Report Generator (report_generator.py)</div>
+    </div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 7: TESTING
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 7</div>
+  <h2>TESTING</h2>
+  <div class="page-range">Pages 53–60 (~8 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">7.1</span>
+    <span class="section-title">Testing Strategy</span>
+    <div class="section-desc">Overview of testing approach: unit tests, integration tests, model accuracy evaluation, API endpoint testing, UI testing. Tools: pytest, manual testing.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.2</span>
+    <span class="section-title">Unit Testing</span>
+    <div class="section-desc">Unit tests for individual modules: preprocess.py, predict.py, disease_info.py, ood_detector.py, image_utils.py. List test cases and pass/fail results.</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 7.1:</strong> Unit Test Cases and Results</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.3</span>
+    <span class="section-title">Integration Testing</span>
+    <div class="section-desc">End-to-end testing of the full pipeline: image upload → preprocessing → prediction → result rendering. API endpoint integration tests.</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 7.2:</strong> Integration Test Scenarios</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.4</span>
+    <span class="section-title">Model Accuracy Testing</span>
+    <div class="section-desc">Evaluation on held-out validation set. Report overall accuracy and per-class accuracy. Compare with and without TTA.</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 7.3:</strong> Per-Class Accuracy Results (with and without TTA)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.5</span>
+    <span class="section-title">Confusion Matrix</span>
+    <div class="placeholder-box">
+      <div class="icon">📊</div>
+      <div><strong>Figure 7.1:</strong> Confusion Matrix (5×5) — Normalized</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📊</div>
+      <div><strong>Figure 7.2:</strong> Confusion Matrix Heatmap (color-coded)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.6</span>
+    <span class="section-title">Precision, Recall, and F1-Score</span>
+    <table class="table-placeholder" style="margin-left:20px">
+      <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr></thead>
+      <tbody>
+        <tr><td>Acne</td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+        <tr><td>Eczema</td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+        <tr><td>Fungal</td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+        <tr><td>Psoriasis</td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+        <tr><td>Normal</td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+        <tr><td><strong>Weighted Avg</strong></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>X.XX</em></td><td><em>N</em></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.7</span>
+    <span class="section-title">Performance Analysis</span>
+    <div class="section-desc">Analysis of model performance: inference time distribution, memory usage, TTA overhead, reliability scoring effectiveness.</div>
+    <div class="placeholder-box">
+      <div class="icon">📈</div>
+      <div><strong>Figure 7.3:</strong> ROC Curves for Each Class (One-vs-Rest)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">📈</div>
+      <div><strong>Figure 7.4:</strong> Inference Latency Distribution Histogram</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">7.8</span>
+    <span class="section-title">Result Screenshots</span>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 7.5:</strong> Screenshot — Correct Prediction (High Confidence)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 7.6:</strong> Screenshot — Low Reliability Alert (Uncertain Prediction)</div>
+    </div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 7.7:</strong> Screenshot — OOD Rejection (Non-skin Image)</div>
+    </div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 8: CONCLUSION & FUTURE ENHANCEMENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 8</div>
+  <h2>CONCLUSION AND FUTURE ENHANCEMENTS</h2>
+  <div class="page-range">Pages 61–64 (~4 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">8.1</span>
+    <span class="section-title">Conclusion</span>
+    <div class="section-desc">Summarize project achievements: successful implementation of a DL-based skin disease detection system with 5-class classification, ~92–96% accuracy, explainability via Grad-CAM++, dual UI deployment, and PDF report generation. Restate the educational/informational purpose.</div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">8.2</span>
+    <span class="section-title">Limitations</span>
+    <div class="subsections">
+      <div class="subsection-item">Limited to 5 disease classes (does not cover all dermatological conditions)</div>
+      <div class="subsection-item">Dataset size may limit generalization to diverse skin tones</div>
+      <div class="subsection-item">Requires good image quality and lighting for accurate predictions</div>
+      <div class="subsection-item">Not suitable for clinical diagnosis — educational tool only</div>
+      <div class="subsection-item">No temporal analysis (single image, not progression tracking)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">8.3</span>
+    <span class="section-title">Future Enhancements</span>
+    <div class="subsections">
+      <div class="subsection-item">Expand to 20+ skin disease classes using larger datasets (ISIC, HAM10000)</div>
+      <div class="subsection-item">Implement ensemble models (MobileNetV2 + EfficientNet + ResNet50)</div>
+      <div class="subsection-item">Add multi-language support for wider accessibility</div>
+      <div class="subsection-item">Develop a mobile app (Android/iOS) using TensorFlow Lite</div>
+      <div class="subsection-item">Integrate with telemedicine platforms for dermatologist referrals</div>
+      <div class="subsection-item">Implement federated learning for privacy-preserving model training</div>
+      <div class="subsection-item">Add disease progression tracking with temporal image comparison</div>
+    </div>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHAPTER 9: APPENDIX
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 9</div>
+  <h2>APPENDIX</h2>
+  <div class="page-range">Pages 65–72 (~8 pages)</div>
+
+  <div class="section-item">
+    <span class="section-num">9.1</span>
+    <span class="section-title">Source Code Structure</span>
+    <div class="section-desc">Complete project file tree with descriptions of each file's purpose.</div>
+    <div class="placeholder-box">
+      <div class="icon">📁</div>
+      <div><strong>Figure 9.1:</strong> Complete Project Directory Tree</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">9.2</span>
+    <span class="section-title">Dataset Samples</span>
+    <div class="section-desc">High-resolution sample images from each of the 5 disease classes, along with their ground-truth labels.</div>
+    <div class="placeholder-box">
+      <div class="icon">🖼️</div>
+      <div><strong>Figure 9.2:</strong> Dataset Sample Grid (5 classes × 4 samples)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">9.3</span>
+    <span class="section-title">GUI Screenshots</span>
+    <div class="section-desc">Full-page screenshots of both Streamlit and web interfaces in various states (idle, uploading, analyzing, results).</div>
+    <div class="placeholder-box">
+      <div class="icon">🖥️</div>
+      <div><strong>Figure 9.3 – 9.8:</strong> Complete UI Screenshots (6 figures)</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">9.4</span>
+    <span class="section-title">Model Parameters</span>
+    <div class="section-desc">Full model.summary() output, hyperparameter table, optimizer configuration.</div>
+    <div class="placeholder-box">
+      <div class="icon">📋</div>
+      <div><strong>Table 9.1:</strong> Complete Hyperparameter Configuration</div>
+    </div>
+  </div>
+
+  <div class="section-item">
+    <span class="section-num">9.5</span>
+    <span class="section-title">CLI / API Reference</span>
+    <div class="section-desc">API endpoint documentation, request/response formats, authentication details.</div>
+    <table class="table-placeholder" style="margin-left:20px">
+      <thead><tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>/predict</td><td>POST</td><td>Bearer Token</td><td>Classify skin image (authenticated)</td></tr>
+        <tr><td>/predict/web</td><td>POST</td><td>None</td><td>Classify skin image (web UI)</td></tr>
+        <tr><td>/predict/batch</td><td>POST</td><td>Bearer Token</td><td>Batch classification (up to 20 images)</td></tr>
+        <tr><td>/health</td><td>GET</td><td>None</td><td>Health check endpoint</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     REFERENCES
+     ═══════════════════════════════════════════════════════════ -->
+<div class="chapter">
+  <div class="chapter-num">Chapter 10</div>
+  <h2>REFERENCES</h2>
+  <div class="page-range">Pages 73–75 (~3 pages) — IEEE Format</div>
+
+  <div class="section-desc" style="margin-bottom:16px">
+    Use IEEE citation style: [Number] Author(s), "Title," <em>Journal/Conference</em>, vol. X, no. Y, pp. A–B, Year.
+  </div>
+
+  <div class="ref-item"><span class="ref-num">[1]</span> A. Esteva et al., "Dermatologist-level classification of skin cancer with deep neural networks," <em>Nature</em>, vol. 542, no. 7639, pp. 115–118, 2017.</div>
+  <div class="ref-item"><span class="ref-num">[2]</span> M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, "MobileNetV2: Inverted Residuals and Linear Bottlenecks," <em>Proc. IEEE CVPR</em>, pp. 4510–4520, 2018.</div>
+  <div class="ref-item"><span class="ref-num">[3]</span> H. A. Haenssle et al., "Man against machine: diagnostic performance of a deep learning convolutional neural network for dermoscopic melanoma recognition," <em>Annals of Oncology</em>, vol. 29, no. 8, pp. 1836–1842, 2018.</div>
+  <div class="ref-item"><span class="ref-num">[4]</span> R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra, "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization," <em>Proc. IEEE ICCV</em>, pp. 618–626, 2017.</div>
+  <div class="ref-item"><span class="ref-num">[5]</span> Author(s), "Title of related paper on skin disease classification using CNN," <em>Journal Name</em>, vol. X, pp. A–B, Year.</div>
+  <div class="ref-item"><span class="ref-num">[6]</span> Author(s), "Title of related paper on transfer learning in medical imaging," <em>Conference Name</em>, pp. A–B, Year.</div>
+  <div class="ref-item"><span class="ref-num">[7]</span> Author(s), "Title of related paper on TTA for robust predictions," <em>Journal Name</em>, vol. X, Year.</div>
+  <div class="ref-item"><span class="ref-num">[8]</span> <em>[Add 5–8 more references as needed following IEEE format]</em></div>
+</div>
+
+<hr class="chapter-divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     FORMATTING GUIDE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="format-guide">
+  <h4>📐 Formatting Requirements</h4>
+  <ul>
+    <li><strong>Font:</strong> Times New Roman, 12pt for body, 14pt bold for headings</li>
+    <li><strong>Line Spacing:</strong> 1.5 line spacing throughout</li>
+    <li><strong>Margins:</strong> Left: 1.5", Top/Right/Bottom: 1"</li>
+    <li><strong>Page Numbering:</strong> Roman numerals for preliminaries (i, ii, iii), Arabic for chapters (1, 2, 3...)</li>
+    <li><strong>Figure Numbering:</strong> Figure X.Y format (e.g., Figure 3.1, Figure 6.5)</li>
+    <li><strong>Table Numbering:</strong> Table X.Y format (e.g., Table 2.1, Table 7.3)</li>
+    <li><strong>Code Snippets:</strong> Use Courier New, 10pt, with syntax highlighting</li>
+    <li><strong>Citations:</strong> IEEE format — numbered references in square brackets [1], [2]</li>
+    <li><strong>Chapters:</strong> Each chapter starts on a new page</li>
+    <li><strong>Headers:</strong> Chapter title on every page header (except first page of chapter)</li>
+    <li><strong>Footers:</strong> Page number centered at bottom</li>
+    <li><strong>Figures/Tables:</strong> Must be referenced in text before they appear</li>
+    <li><strong>Paper Size:</strong> A4 (210mm × 297mm)</li>
+  </ul>
+</div>
+
+<!-- Report Footer -->
+<div class="report-footer">
+  <strong>Skin Disease Detection Using Deep Learning</strong><br>
+  B.Tech Mini Project Report · Department of Computer Science & Engineering<br>
+  <em>This is a report structure template only — fill in actual content for submission.</em>
+</div>
+
+</div><!-- /paper -->
+</div><!-- /report-container -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     PDF DOWNLOAD SCRIPT
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+function downloadReportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  let y = 12;
+  let pageNum = 1;
+
+  function san(t) {
+    return t.replace(/\u2014/g,'-').replace(/\u2013/g,'-').replace(/\u2018/g,"'").replace(/\u2019/g,"'")
+      .replace(/\u201c/g,'"').replace(/\u201d/g,'"').replace(/\u2022/g,'-').replace(/\u2026/g,'...')
+      .replace(/\u00a0/g,' ').replace(/\u2192/g,'->').replace(/\u2190/g,'<-');
+  }
+
+  function addFooter() {
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,150);
+    doc.text('Skin Disease Detection Using Deep Learning - B.Tech Report Structure', pw/2, ph-7, {align:'center'});
+    doc.text(`Page ${pageNum}`, pw-15, ph-7);
+  }
+
+  function newPage() {
+    addFooter();
+    doc.addPage();
+    pageNum++;
+    y = 15;
+  }
+
+  function checkPage(need) {
+    if (y + need > ph - 18) { newPage(); }
+  }
+
+  function heading(text, size, r, g, b) {
+    checkPage(14);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(size);
+    doc.setTextColor(r, g, b);
+    doc.text(san(text), 15, y);
+    y += size * 0.5 + 4;
+  }
+
+  function subheading(num, text) {
+    checkPage(10);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(46,125,50);
+    doc.text(san(num), 15, y);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(30,30,30);
+    doc.text(san(text), 15 + doc.getTextWidth(san(num)) + 3, y);
+    y += 7;
+  }
+
+  function bodyText(text, indent) {
+    checkPage(8);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    doc.setTextColor(60,60,60);
+    const lines = doc.splitTextToSize(san(text), pw - 30 - (indent||0));
+    doc.text(lines, 15 + (indent||0), y);
+    y += lines.length * 5 + 2;
+  }
+
+  function bullet(text, indent) {
+    checkPage(7);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    doc.setTextColor(60,60,60);
+    const x = 18 + (indent||0);
+    doc.text('-', x - 4, y);
+    const lines = doc.splitTextToSize(san(text), pw - 35 - (indent||0));
+    doc.text(lines, x, y);
+    y += lines.length * 5 + 1;
+  }
+
+  function placeholder(text) {
+    checkPage(10);
+    doc.setDrawColor(76,175,80);
+    doc.setLineWidth(0.3);
+    doc.setLineDashPattern([2,2],0);
+    doc.rect(20, y-3, pw-40, 8);
+    doc.setLineDashPattern([],0);
+    doc.setFont('helvetica','italic');
+    doc.setFontSize(9);
+    doc.setTextColor(100,130,100);
+    doc.text(san(text), 24, y+2);
+    y += 12;
+  }
+
+  function divider() {
+    checkPage(6);
+    doc.setDrawColor(76,175,80);
+    doc.setLineWidth(0.3);
+    doc.line(15, y, pw-15, y);
+    y += 6;
+  }
+
+  // ═══ TITLE PAGE ═══
+  doc.setFillColor(76,175,80);
+  doc.rect(0,0,pw,4,'F');
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(27,94,32);
+  doc.text('SKIN DISEASE DETECTION', pw/2, 50, {align:'center'});
+  doc.text('USING DEEP LEARNING', pw/2, 62, {align:'center'});
+
+  doc.setFontSize(12);
+  doc.setTextColor(100,100,100);
+  doc.text('B.Tech Mini Project Report Structure', pw/2, 78, {align:'center'});
+  doc.text('Computer Science & Engineering', pw/2, 86, {align:'center'});
+
+  doc.setDrawColor(76,175,80);
+  doc.setLineWidth(0.5);
+  doc.line(60, 92, pw-60, 92);
+
+  doc.setFontSize(10);
+  doc.setTextColor(76,175,80);
+  doc.text('Report Template - Structure Only', pw/2, 100, {align:'center'});
+  doc.text('(No actual content - fill in for submission)', pw/2, 107, {align:'center'});
+
+  addFooter();
+
+  // ═══ TABLE OF CONTENTS ═══
+  newPage();
+  heading('TABLE OF CONTENTS', 16, 27, 94, 32);
+  y += 2;
+
+  const toc = [
+    ['Abstract', 'i'],
+    ['List of Abbreviations', 'ii'],
+    ['List of Figures', 'iii'],
+    ['List of Tables', 'iv'],
+    ['Chapter 1 - Introduction', '1-7'],
+    ['  1.1 About the Project', '1'],
+    ['  1.2 Goals/Objectives', '2'],
+    ['  1.3 Problem Statement', '3'],
+    ['  1.4 Background Study', '4'],
+    ['  1.5 Scope of the Project', '5'],
+    ['  1.6 Motivation', '6'],
+    ['Chapter 2 - Literature Survey', '8-17'],
+    ['  2.1 Existing Systems', '8'],
+    ['  2.2 Traditional Approaches', '9'],
+    ['  2.3 Deep Learning Approaches', '11'],
+    ['  2.4 CNN-based Classification', '13'],
+    ['  2.5 Related Research Papers', '14'],
+    ['  2.6 Comparative Analysis', '16'],
+    ['Chapter 3 - Proposed System', '18-25'],
+    ['Chapter 4 - System Requirements', '26-29'],
+    ['Chapter 5 - System Design', '30-38'],
+    ['Chapter 6 - Implementation', '39-52'],
+    ['Chapter 7 - Testing', '53-60'],
+    ['Chapter 8 - Conclusion', '61-64'],
+    ['Chapter 9 - Appendix', '65-72'],
+    ['References', '73-75'],
+  ];
+
+  toc.forEach(([title, page]) => {
+    checkPage(6);
+    const isChapter = !title.startsWith('  ');
+    doc.setFont('helvetica', isChapter ? 'bold' : 'normal');
+    doc.setFontSize(isChapter ? 11 : 10);
+    doc.setTextColor(isChapter ? 27 : 60, isChapter ? 94 : 60, isChapter ? 32 : 60);
+    const indent = title.startsWith('  ') ? 8 : 0;
+    doc.text(san(title.trim()), 18 + indent, y);
+    doc.text(page, pw - 20, y, {align:'right'});
+    y += isChapter ? 7 : 5.5;
+  });
+
+  // ═══ ABSTRACT ═══
+  newPage();
+  heading('ABSTRACT', 16, 27, 94, 32);
+  bodyText('The abstract should concisely cover the following in 200-300 words:');
+  bullet('Project motivation and problem context (skin disease prevalence, diagnostic gaps)');
+  bullet('Objective of the system (AI-powered skin disease detection)');
+  bullet('Methodology used (MobileNetV2 transfer learning, TTA, Grad-CAM++)');
+  bullet('Dataset description (5 classes, training/validation split)');
+  bullet('Key results (accuracy achieved, confidence metrics)');
+  bullet('Conclusion summary');
+  bullet('Keywords: Deep Learning, CNN, MobileNetV2, Transfer Learning, Skin Disease, Dermatology, TTA');
+
+  // ═══ LIST OF ABBREVIATIONS ═══
+  divider();
+  heading('LIST OF ABBREVIATIONS', 14, 27, 94, 32);
+  const abbrs = [
+    ['AI','Artificial Intelligence'],['CNN','Convolutional Neural Network'],
+    ['DL','Deep Learning'],['ML','Machine Learning'],['TL','Transfer Learning'],
+    ['TTA','Test-Time Augmentation'],['GAP','Global Average Pooling'],
+    ['Grad-CAM','Gradient-weighted Class Activation Mapping'],
+    ['OOD','Out-of-Distribution'],['API','Application Programming Interface'],
+    ['REST','Representational State Transfer'],['GUI','Graphical User Interface'],
+    ['OTC','Over-the-Counter'],['PDF','Portable Document Format'],
+    ['RGB','Red Green Blue'],['ReLU','Rectified Linear Unit'],
+    ['GPU','Graphics Processing Unit'],['JSON','JavaScript Object Notation'],
+  ];
+  abbrs.forEach(([abbr,full]) => {
+    checkPage(6);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(46,125,50);
+    doc.text(abbr, 18, y);
+    doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);
+    doc.text(full, 55, y);
+    y += 5.5;
+  });
+
+  // ═══ CHAPTER 1: INTRODUCTION ═══
+  newPage();
+  heading('CHAPTER 1: INTRODUCTION', 16, 27, 94, 32);
+  bodyText('Pages 1-7 (~6 pages)', 0);
+  y += 2;
+
+  subheading('1.1','About the Project');
+  bodyText('Introduce the project - AI-based skin disease detection using deep learning. Describe purpose, target users, deployment modes (Streamlit, FastAPI web app).', 4);
+
+  subheading('1.2','Goals and Objectives');
+  bodyText('List 5-7 specific, measurable objectives.', 4);
+  bullet('Primary objectives (classification accuracy, user interface, explainability)', 4);
+  bullet('Secondary objectives (PDF report, API endpoint, OOD detection)', 4);
+
+  subheading('1.3','Problem Statement');
+  bodyText('Define the problem: high prevalence of skin diseases, shortage of dermatologists, delayed diagnosis, need for AI screening.', 4);
+
+  subheading('1.4','Background Study');
+  bodyText('Evolution of computer-aided diagnosis, CNNs in medical imaging, transfer learning, current state-of-the-art.', 4);
+
+  subheading('1.5','Scope of the Project');
+  bodyText('Define coverage: 5 disease classes. Educational/informational tool, not a medical device.', 4);
+
+  subheading('1.6','Motivation');
+  bodyText('WHO statistics on skin diseases, cost of misdiagnosis, AI potential to bridge healthcare gaps.', 4);
+
+  // ═══ CHAPTER 2: LITERATURE SURVEY ═══
+  newPage();
+  heading('CHAPTER 2: LITERATURE SURVEY', 16, 27, 94, 32);
+  bodyText('Pages 8-17 (~10 pages)', 0);
+  y += 2;
+
+  subheading('2.1','Existing Skin Disease Detection Systems');
+  subheading('2.2','Traditional Image Processing Approaches');
+  subheading('2.3','Deep Learning Approaches');
+  subheading('2.4','CNN-based Disease Classification');
+  placeholder('Figure 2.1: MobileNetV2 Architecture Block Diagram');
+  subheading('2.5','Related Research Papers');
+  bodyText('Summarize 8-12 related research papers with year, authors, methodology, dataset, accuracy.', 4);
+  subheading('2.6','Comparative Analysis of Existing Work');
+  placeholder('Table 2.1: Comparative Analysis of Related Work');
+
+  // ═══ CHAPTER 3: PROPOSED SYSTEM ═══
+  newPage();
+  heading('CHAPTER 3: PROPOSED SYSTEM', 16, 27, 94, 32);
+  bodyText('Pages 18-25 (~8 pages)', 0);
+  y += 2;
+
+  subheading('3.1','Proposed Architecture');
+  placeholder('Figure 3.1: High-Level System Architecture Diagram');
+  subheading('3.2','Workflow');
+  placeholder('Figure 3.2: System Workflow / Activity Diagram');
+  subheading('3.3','Dataset Overview');
+  placeholder('Table 3.1: Dataset Distribution per Class');
+  placeholder('Figure 3.3: Sample Images from Each Disease Class');
+  subheading('3.4','Model Selection');
+  placeholder('Table 3.2: Custom CNN vs MobileNetV2 Comparison');
+  subheading('3.5','Advantages of Proposed System');
+  subheading('3.6','Use Case Diagram');
+  placeholder('Figure 3.4: UML Use Case Diagram');
+  subheading('3.7','Architecture Diagram');
+  placeholder('Figure 3.5: MobileNetV2 Transfer Learning Architecture');
+
+  // ═══ CHAPTER 4: SYSTEM REQUIREMENTS ═══
+  newPage();
+  heading('CHAPTER 4: SYSTEM REQUIREMENTS', 16, 27, 94, 32);
+  bodyText('Pages 26-29 (~4 pages)', 0);
+  y += 2;
+
+  subheading('4.1','Software Requirements');
+  placeholder('Table 4.1: Software Requirements');
+  subheading('4.2','Hardware Requirements');
+  placeholder('Table 4.2: Hardware Requirements');
+  subheading('4.3','Functional Requirements');
+  bullet('FR-01: Accept skin images JPG/PNG (max 10 MB)', 4);
+  bullet('FR-02: Classify into 5 disease categories', 4);
+  bullet('FR-03: Display confidence and severity', 4);
+  bullet('FR-04: Generate Grad-CAM++ heatmaps', 4);
+  bullet('FR-05: 8-pass TTA for robust predictions', 4);
+  bullet('FR-06: OOD detection for non-skin images', 4);
+  bullet('FR-07: Generate downloadable PDF reports', 4);
+  bullet('FR-08: REST API endpoints for integration', 4);
+  subheading('4.4','Non-Functional Requirements');
+  bullet('NFR-01: Inference under 3 seconds', 4);
+  bullet('NFR-02: Responsive design', 4);
+  bullet('NFR-03: Rate limiting', 4);
+
+  // ═══ CHAPTERS 5-9 (condensed) ═══
+  newPage();
+  heading('CHAPTER 5: SYSTEM DESIGN', 16, 27, 94, 32);
+  bodyText('Pages 30-38 (~9 pages)', 0);
+  y += 2;
+  subheading('5.1','Design Principles');
+  subheading('5.2','Data Flow Diagram');
+  placeholder('Figure 5.1: Level-0 DFD | Figure 5.2: Level-1 DFD');
+  subheading('5.3','Module Design');
+  placeholder('Table 5.1: Module Breakdown');
+  subheading('5.4','Dataset Processing Flow');
+  placeholder('Figure 5.3: Image Preprocessing Pipeline');
+  subheading('5.5','Model Training Pipeline');
+  placeholder('Figure 5.4: Accuracy Curves | Figure 5.5: Loss Curves');
+  subheading('5.6','UML Diagrams');
+  placeholder('Figure 5.6: Class Diagram | Figure 5.7: Sequence Diagram | Figure 5.8: Deployment Diagram');
+  subheading('5.7','Storage Design');
+
+  newPage();
+  heading('CHAPTER 6: IMPLEMENTATION', 16, 27, 94, 32);
+  bodyText('Pages 39-52 (~14 pages)', 0);
+  y += 2;
+  subheading('6.1','Development Environment');
+  subheading('6.2','Dataset Collection');
+  subheading('6.3','Image Preprocessing (preprocess.py)');
+  placeholder('Code Snippet 6.1: Key preprocessing functions');
+  subheading('6.4','CNN Model Implementation (train_model.py)');
+  placeholder('Code Snippet 6.2: Model architecture | Table 6.1: Model Summary');
+  subheading('6.5','Training and Validation');
+  placeholder('Figure 6.3: Training History Plots');
+  subheading('6.6','Prediction Module (predict.py)');
+  placeholder('Code Snippet 6.3: TTA prediction pipeline');
+  subheading('6.7','Web Application - GUI Implementation');
+  placeholder('Figures 6.4-6.9: Screenshots (Streamlit, Web UI, PDF Report)');
+  subheading('6.8','Explainability Module (explainability.py)');
+  placeholder('Figure 6.10: Grad-CAM++ Heatmap Examples');
+  subheading('6.9','Additional Code Snippets');
+  placeholder('Code Snippets 6.4-6.6: OOD Detection, API, Report Generator');
+
+  newPage();
+  heading('CHAPTER 7: TESTING', 16, 27, 94, 32);
+  bodyText('Pages 53-60 (~8 pages)', 0);
+  y += 2;
+  subheading('7.1','Testing Strategy');
+  subheading('7.2','Unit Testing');
+  placeholder('Table 7.1: Unit Test Cases and Results');
+  subheading('7.3','Integration Testing');
+  subheading('7.4','Model Accuracy Testing');
+  subheading('7.5','Confusion Matrix');
+  placeholder('Figure 7.1: Confusion Matrix (5x5) | Figure 7.2: Heatmap');
+  subheading('7.6','Precision, Recall, and F1-Score');
+  placeholder('Table 7.3: Classification Report');
+  subheading('7.7','Performance Analysis');
+  placeholder('Figure 7.3: ROC Curves | Figure 7.4: Latency Histogram');
+  subheading('7.8','Result Screenshots');
+  placeholder('Figures 7.5-7.7: Prediction Screenshots');
+
+  newPage();
+  heading('CHAPTER 8: CONCLUSION AND FUTURE ENHANCEMENTS', 16, 27, 94, 32);
+  bodyText('Pages 61-64 (~4 pages)', 0);
+  y += 2;
+  subheading('8.1','Conclusion');
+  subheading('8.2','Limitations');
+  subheading('8.3','Future Enhancements');
+
+  divider();
+  heading('CHAPTER 9: APPENDIX', 14, 27, 94, 32);
+  subheading('9.1','Source Code Structure');
+  subheading('9.2','Dataset Samples');
+  subheading('9.3','GUI Screenshots');
+  subheading('9.4','Model Parameters');
+  subheading('9.5','CLI / API Reference');
+
+  divider();
+  heading('REFERENCES', 14, 27, 94, 32);
+  bodyText('IEEE Citation Format: [Number] Author(s), "Title," Journal, vol. X, pp. A-B, Year.', 0);
+  y += 2;
+  bodyText('[1] A. Esteva et al., "Dermatologist-level classification of skin cancer with deep neural networks," Nature, vol. 542, pp. 115-118, 2017.', 0);
+  bodyText('[2] M. Sandler et al., "MobileNetV2: Inverted Residuals and Linear Bottlenecks," CVPR, pp. 4510-4520, 2018.', 0);
+  bodyText('[3] R. R. Selvaraju et al., "Grad-CAM: Visual Explanations from Deep Networks," ICCV, pp. 618-626, 2017.', 0);
+  bodyText('[4-8] [Add remaining references in IEEE format]', 0);
+
+  addFooter();
+
+  doc.save('BTech_Report_Structure_Skin_Disease_Detection.pdf');
+}
+</script>
+
+</body>
+</html>
