@@ -30,5 +30,5 @@ fpdf2>=2.7.0
 
 # ─── Testing & Quality ────────────────────────────────────
 pytest>=7.4.0
-pytest-cov>=4.1.0
+pytest-cov>=7.1.0
 flake8>=7.0.0
