@@ -140,5 +140,3 @@ def test_batch_single_file(client):
     assert data["total"] == 1
     assert data["results"][0]["disease"] == "normal"
 
-
-

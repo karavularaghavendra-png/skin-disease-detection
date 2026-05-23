@@ -48,4 +48,3 @@ def test_no_empty_symptom_lists():
         assert len(info.get("symptoms", [])) > 0, (
             f"{cls!r} has an empty symptoms list"
         )
-
