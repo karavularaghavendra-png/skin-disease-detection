@@ -8,7 +8,7 @@ scipy>=1.11,<2
 
 # ─── Visualization ─────────────────────────────────────────
 matplotlib>=3.7,<4
-seaborn>=0.13,<1
+seaborn>=0.13.2,<1
 
 # ─── Web Application ──────────────────────────────────────
 streamlit>=1.30,<2
