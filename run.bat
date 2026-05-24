@@ -29,6 +29,6 @@ REM Open browser automatically after 5 seconds
 start "" timeout /t 5 /nobreak >nul & start "" http://localhost:8080/static/index.html#predict
 
 REM Run on 0.0.0.0 so others on same Wi-Fi/LAN can access it
-python -m uvicorn api:app --reload --host 0.0.0.0 --port 8080
+call .venv\Scripts\activate.bat && python -m uvicorn api:app --reload --host 0.0.0.0 --port 8080
 
 pause

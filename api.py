@@ -118,16 +118,20 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)
         raise HTTPException(status_code=401, detail="Invalid API key")
 
 
-# ── CORS — restricted to known origins ────────────────────────────────────────
-_CORS_ORIGINS = os.getenv(
+# ── CORS — supports both local dev and cloud (HF Spaces, Render, etc.) ──────
+_CORS_ORIGINS_RAW = os.getenv(
     "CORS_ORIGINS",
     "http://localhost:8501,http://localhost:3000,http://localhost:8000,http://localhost:8080",
 )
+# Allow wildcard '*' for cloud deployments (set CORS_ORIGINS=* in HF Spaces secrets)
+_allow_all = _CORS_ORIGINS_RAW.strip() == "*"
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_CORS_ORIGINS.split(","),
+    allow_origins=["*"] if _allow_all else _CORS_ORIGINS_RAW.split(","),
+    allow_origin_regex=r"https://.*\.hf\.space" if not _allow_all else None,
     allow_methods=["GET", "POST"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["*"] if _allow_all else ["Authorization", "Content-Type"],
+    allow_credentials=not _allow_all,
 )
 
 
