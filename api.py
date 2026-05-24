@@ -245,6 +245,19 @@ async def predict(
         top_results, avg_preds, all_pass_probs = tta_result
         disease = top_results[0]["disease"]
         confidence = top_results[0]["confidence"]  # already 0-100
+        tta_agreement = top_results[0].get("tta_agreement", 0)
+
+        # ── 7b. "Normal" prediction gate ──────────────────────────────
+        if disease.lower() == "normal" and (confidence < 70 or tta_agreement < 75):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Unable to identify a skin condition in this image. "
+                    f"The model predicted 'Normal Skin' with only {confidence:.0f}% confidence "
+                    f"and {tta_agreement:.0f}% TTA agreement, which suggests this may not be "
+                    "a proper skin image. Please upload a clear, close-up photo of human skin."
+                ),
+            )
 
         # ── 8. Reliability analysis (with TTA disagreement) ───────────
         reliability = analyze_prediction_reliability(
@@ -405,6 +418,23 @@ async def predict_web(
         top_results, avg_preds, all_pass_probs = tta_result
         disease = top_results[0]["disease"]
         confidence = top_results[0]["confidence"]  # 0-100
+        tta_agreement = top_results[0].get("tta_agreement", 0)
+
+        # ── 7b. "Normal" prediction gate ──────────────────────────────
+        # If the model predicts "normal" (healthy skin) with low confidence
+        # or low TTA agreement, it's likely a non-skin object that slipped
+        # past the OOD detector (e.g. paper, wall, clothing).
+        # Require higher confidence for "normal" to prevent false "healthy" results.
+        if disease.lower() == "normal" and (confidence < 70 or tta_agreement < 75):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Unable to identify a skin condition in this image. "
+                    f"The model predicted 'Normal Skin' with only {confidence:.0f}% confidence "
+                    f"and {tta_agreement:.0f}% TTA agreement, which suggests this may not be "
+                    "a proper skin image. Please upload a clear, close-up photo of human skin."
+                ),
+            )
 
         # ── 8. Reliability analysis (with TTA disagreement) ───────────
         reliability = analyze_prediction_reliability(
