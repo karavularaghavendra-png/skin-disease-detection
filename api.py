@@ -52,17 +52,25 @@ def _is_valid_image_bytes(data: bytes) -> bool:
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Model warmup on startup — avoids cold-start latency on first request
+# Model warmup on startup — runs in background thread so server starts fast
 # ─────────────────────────────────────────────────────────────────────────────
+def _warmup_model():
+    """Load model in background thread — server is already accepting requests."""
+    import threading
+    def _load():
+        try:
+            from predict import load_model_cached
+            load_model_cached()
+            print("[OK] Model pre-loaded successfully.")
+        except Exception as exc:
+            print(f"[WARNING] Model warmup failed: {exc} -- will load on first request.")
+    threading.Thread(target=_load, daemon=True).start()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Pre-load the model into memory at startup, not on first request."""
-    try:
-        from predict import load_model_cached
-        load_model_cached()
-        print("[OK] Model pre-loaded successfully on startup.")
-    except Exception as exc:
-        print(f"[WARNING] Model warmup failed: {exc} -- will retry on first request.")
+    """Start model warmup in background, server is ready immediately."""
+    _warmup_model()
     yield
 
 
