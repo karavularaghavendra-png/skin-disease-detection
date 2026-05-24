@@ -235,7 +235,8 @@ async def predict(
                 detail=(
                     "This image does not appear to contain human skin. "
                     f"Skin pixel ratio: {skin_ratio:.1%}. "
-                    "Please upload a clear photo of the affected skin area."
+                    "This tool only works with human skin images. "
+                    "Please upload a clear, close-up photo of the affected skin area."
                 ),
             )
 
@@ -394,7 +395,8 @@ async def predict_web(
                 detail=(
                     "This image does not appear to contain human skin. "
                     f"Skin pixel ratio: {skin_ratio:.1%}. "
-                    "Please upload a clear photo of the affected skin area."
+                    "This tool only works with human skin images. "
+                    "Please upload a clear, close-up photo of the affected skin area."
                 ),
             )
 

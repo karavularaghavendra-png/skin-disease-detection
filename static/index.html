@@ -785,9 +785,9 @@ body::before {
 
 /* Error */
 .error-msg {
-  background:rgba(220,71,71,0.06); border:1px solid rgba(220,71,71,0.18);
-  border-radius:12px; padding:12px 14px; font-size:12px; color:#b93030;
-  margin-top:12px; display:none;
+  background:rgba(220,71,71,0.08); border:1px solid rgba(220,71,71,0.25);
+  border-radius:12px; padding:16px 18px; font-size:13px; color:#b93030;
+  margin-top:12px; display:none; line-height:1.5;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1233,7 +1233,7 @@ body::before {
     ⚠️ <strong>Medical Disclaimer:</strong> This system is for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult a certified dermatologist for clinical evaluation and treatment.
   </div>
   <div class="footer-copy">
-    © 2025 Skin Disease Detection Using Deep Learning · Built with <a href="https://fastapi.tiangolo.com" target="_blank">FastAPI</a> + <a href="https://www.tensorflow.org" target="_blank">TensorFlow</a>
+    © 2026 Skin Disease Detection Using Deep Learning · Built with <a href="https://fastapi.tiangolo.com" target="_blank">FastAPI</a> + <a href="https://www.tensorflow.org" target="_blank">TensorFlow</a>
   </div>
 </footer>
 
@@ -1614,7 +1614,22 @@ function handleFile(file) {
   reader.readAsDataURL(file);
 }
 
-function showError(msg) { errorMsg.textContent = msg; errorMsg.style.display = 'block'; }
+function showError(msg, isWarning = false) {
+  if (isWarning) {
+    errorMsg.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:28px;line-height:1">&#9888;</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:#b93030">Not a Human Skin Image</div>
+          <div style="font-size:12px;color:#7a2020;line-height:1.6">${msg}</div>
+          <div style="margin-top:8px;font-size:11px;color:#999;font-style:italic">This tool only analyzes human skin conditions: Acne, Eczema, Fungal Infections, Psoriasis.</div>
+        </div>
+      </div>`;
+  } else {
+    errorMsg.textContent = msg;
+  }
+  errorMsg.style.display = 'block';
+}
 function hideError() { errorMsg.style.display = 'none'; }
 
 function setState(state) {
@@ -1643,7 +1658,12 @@ async function analyzeImage() {
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.detail || `Server error (${response.status})`);
+      const detail = errData.detail || `Server error (${response.status})`;
+      // Detect non-skin image (422) for prominent warning
+      if (response.status === 422) {
+        throw { skinWarning: true, message: detail };
+      }
+      throw new Error(detail);
     }
 
     const result = await response.json();
@@ -1651,7 +1671,11 @@ async function analyzeImage() {
     renderResult(result);
   } catch (err) {
     setState('idle');
-    showError(err.message || 'Analysis failed. Please try again with a clearer image.');
+    if (err.skinWarning) {
+      showError(err.message, true);
+    } else {
+      showError(err.message || 'Analysis failed. Please try again with a clearer image.');
+    }
     console.error(err);
   } finally {
     analyzeBtn.disabled = false;
