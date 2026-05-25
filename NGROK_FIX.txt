@@ -1,0 +1,59 @@
+NGROK ERROR FIX — READ THIS WHEN YOU SEE ERR_NGROK_8012
+=========================================================
+
+WHY IT HAPPENS
+--------------
+ERR_NGROK_8012 means ngrok is online but the FastAPI server
+is NOT running. This happens every time you restart your PC
+or close the command prompt. This is normal — not a bug.
+
+
+HOW TO FIX IT IN 60 SECONDS
+-----------------------------
+Double-click:  auto_start.bat
+(in this same folder)
+
+Wait 30 seconds → Your app is back online.
+
+
+IF auto_start.bat DOESN'T WORK
+--------------------------------
+Open Command Prompt (Win+R, type cmd, Enter)
+
+Step 1 — Start the server:
+  cd C:\Users\karav\OneDrive\Desktop\skin_disease_detection
+  start "Server" /min python -m uvicorn api:app --host 0.0.0.0 --port 8080
+
+Wait 15 seconds, then:
+
+Step 2 — Start ngrok:
+  start "Ngrok" /min ngrok http 8080
+
+Wait 10 seconds. Done.
+
+
+CHECK IF IT WORKED
+-------------------
+Open browser and go to:
+  http://localhost:8080/health
+
+You should see:  {"status":"healthy","version":"2.2.0"}
+
+
+YOUR LINKS
+-----------
+Public URL:  https://renounce-usual-icing.ngrok-free.dev
+Local URL:   http://localhost:8080
+API Docs:    http://localhost:8080/docs
+
+
+NGROK WARNINGS (NOT ERRORS)
+-----------------------------
+ERR_NGROK_6024 = ngrok shows a "you are visiting..." warning page.
+This is NORMAL. Just click "Visit Site" and your app loads fine.
+
+
+PERMANENT FIX
+--------------
+Deploy to Hugging Face Spaces (free cloud, always online, no PC needed).
+See: hf_deployment_guide.md (in this folder)
