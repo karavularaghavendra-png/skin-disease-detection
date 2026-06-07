@@ -86,23 +86,56 @@ def _find_first(candidates):
 # Safe Model Loader (handles old Keras batch_shape issue)
 # ─────────────────────────────────────────────────────────────
 def _load_model_safe(model_path):
+    # First attempt: plain load
     try:
         return tf.keras.models.load_model(model_path, compile=False)
     except (TypeError, ValueError) as e:
-        if "batch_shape" not in str(e):
-            raise
+        err_msg = str(e)
 
-    import h5py
-    print(f"Patching old Keras InputLayer format in {model_path}...")
-    with h5py.File(model_path, "r+") as f:
-        if "model_config" in f.attrs:
-            cfg = f.attrs["model_config"]
-            if isinstance(cfg, bytes):
-                cfg = cfg.decode("utf-8")
-            cfg = cfg.replace('"batch_shape"', '"batch_input_shape"')
-            f.attrs["model_config"] = cfg
+        # ── Fix 1: DepthwiseConv2D 'groups' kwarg (Keras version mismatch) ──
+        if "groups" in err_msg and "DepthwiseConv2D" in err_msg:
+            print(f"[FIX] Patching DepthwiseConv2D 'groups' kwarg for {model_path}...")
+            import h5py, json as _json
+            with h5py.File(model_path, "r+") as f:
+                if "model_config" in f.attrs:
+                    cfg = f.attrs["model_config"]
+                    if isinstance(cfg, bytes):
+                        cfg = cfg.decode("utf-8")
+                    cfg_dict = _json.loads(cfg)
 
-    return tf.keras.models.load_model(model_path, compile=False)
+                    def _strip_groups(d):
+                        """Recursively remove 'groups' from DepthwiseConv2D configs."""
+                        if isinstance(d, dict):
+                            cls = d.get("class_name", "")
+                            if cls == "DepthwiseConv2D" and "config" in d:
+                                d["config"].pop("groups", None)
+                            for v in d.values():
+                                _strip_groups(v)
+                        elif isinstance(d, list):
+                            for item in d:
+                                _strip_groups(item)
+
+                    _strip_groups(cfg_dict)
+                    f.attrs["model_config"] = _json.dumps(cfg_dict)
+
+            return tf.keras.models.load_model(model_path, compile=False)
+
+        # ── Fix 2: old Keras batch_shape → batch_input_shape ──
+        if "batch_shape" in err_msg:
+            import h5py
+            print(f"[FIX] Patching old Keras InputLayer format in {model_path}...")
+            with h5py.File(model_path, "r+") as f:
+                if "model_config" in f.attrs:
+                    cfg = f.attrs["model_config"]
+                    if isinstance(cfg, bytes):
+                        cfg = cfg.decode("utf-8")
+                    cfg = cfg.replace('"batch_shape"', '"batch_input_shape"')
+                    f.attrs["model_config"] = cfg
+
+            return tf.keras.models.load_model(model_path, compile=False)
+
+        # Unknown error — re-raise
+        raise
 
 
 # ─────────────────────────────────────────────────────────────

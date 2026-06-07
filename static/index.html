@@ -1654,6 +1654,7 @@ async function analyzeImage() {
     const response = await fetch('/predict/web', {
       method: 'POST',
       body: formData,
+      headers: { 'ngrok-skip-browser-warning': 'true' },
     });
 
     if (!response.ok) {

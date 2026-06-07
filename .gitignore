@@ -52,6 +52,23 @@ logs/
 # Code review graph
 .code-review-graph/
 
+# AI agent configs (local only)
+.claude/
+.cursor/
+.cursorrules
+.windsurfrules
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.mcp.json
+.opencode.json
+.pre-commit-config.yaml
+
+# Local-only utilities
+create_startup_shortcut.ps1
+create_zip.bat
+static/report_structure.html
+
 # Portable ZIP (share separately, too large for git)
 *.zip
 

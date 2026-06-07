@@ -19,7 +19,7 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -128,7 +128,10 @@ _allow_all = _CORS_ORIGINS_RAW.strip() == "*"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"] if _allow_all else _CORS_ORIGINS_RAW.split(","),
-    allow_origin_regex=r"https://.*\.hf\.space" if not _allow_all else None,
+    allow_origin_regex=(
+        r"https://.*\.(hf\.space|ngrok-free\.dev|ngrok\.io)"
+        if not _allow_all else None
+    ),
     allow_methods=["GET", "POST"],
     allow_headers=["*"] if _allow_all else ["Authorization", "Content-Type"],
     allow_credentials=not _allow_all,
@@ -142,6 +145,8 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    # Bypass ngrok free-tier interstitial warning page (ERR_NGROK_6024)
+    response.headers["ngrok-skip-browser-warning"] = "true"
     if _ENVIRONMENT == "production":
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
@@ -165,7 +170,14 @@ if _STATIC_DIR.is_dir():
 # ─────────────────────────────────────────────────────────────────────────────
 @app.get("/", tags=["system"], include_in_schema=False)
 async def root():
-    """Redirect to the web UI."""
+    """Serve the web UI directly (bypasses ngrok free-tier interstitial)."""
+    index_path = _STATIC_DIR / "index.html"
+    if index_path.is_file():
+        return FileResponse(
+            str(index_path),
+            media_type="text/html",
+            headers={"ngrok-skip-browser-warning": "true"},
+        )
     return RedirectResponse(url="/static/index.html")
 
 

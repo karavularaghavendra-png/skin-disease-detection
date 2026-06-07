@@ -28,7 +28,45 @@
 - Set `API_KEY` environment variable for production: `export API_KEY=your-secret-key`
 - In production mode (`ENVIRONMENT=production`), the server will refuse to start without API_KEY
 
-### 4. Rate Limiting
+### 4. ngrok Tunnel Issues
+
+**Error:** `ERR_NGROK_4018: Your ngrok agent is not connected to a valid ngrok account`
+— OR — `ERR_NGROK_108: authtoken is not valid`
+— OR — ngrok tunnel silently fails / no public URL shown
+
+**Root Cause:** ngrok requires a free authtoken to create tunnels. Without it, `ngrok http 8000` will fail immediately.
+
+**Fix (one-time setup, ~2 minutes):**
+
+1. **Sign up** for a free account at: https://dashboard.ngrok.com/signup
+2. **Copy your authtoken** from: https://dashboard.ngrok.com/get-started/your-authtoken
+3. **Configure ngrok** — open a terminal and run:
+   ```
+   ngrok config add-authtoken YOUR_TOKEN_HERE
+   ```
+4. **Re-run** `auto_start.bat` — the tunnel should now work.
+
+**Other common ngrok issues:**
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `ERR_NGROK_108` | Authtoken expired/revoked | Get a new token from the dashboard and run `ngrok config add-authtoken NEW_TOKEN` |
+| `ERR_NGROK_4022` | Too many tunnels | Free plan allows 1 tunnel. Close other tunnels or kill old ngrok: `taskkill /F /IM ngrok.exe` |
+| URL changes every restart | Free plan uses random URLs | Upgrade to a paid plan for fixed domains, or just copy the new URL each time |
+| `bind: address already in use` | Port 8000 occupied | Kill the process using port 8000: `netstat -ano \| findstr :8000` then `taskkill /PID <pid> /F` |
+| Tunnel works but page shows "Visit blocked" | ngrok interstitial page | Click "Visit Site" on the ngrok warning page. This is normal for free ngrok plans. |
+| Tunnel silently fails / no URL shown | Config file uses old `version: '2'` format | Run `ngrok config upgrade` to migrate to v3 format. `auto_start.bat` does this automatically. |
+
+**Verifying ngrok is working:**
+```bash
+# Check if ngrok tunnel is active:
+curl http://localhost:4040/api/tunnels
+
+# Check ngrok config location:
+ngrok config check
+```
+
+### 5. Rate Limiting
 **Error:** `429 Too Many Requests`
 
 **Solution:**
@@ -36,7 +74,7 @@
 - Implement exponential backoff in client code
 - Consider upgrading to paid tier for higher limits
 
-### 5. Memory Issues
+### 6. Memory Issues
 **Error:** `MemoryError` or out-of-memory crashes
 
 **Solution:**
@@ -44,7 +82,7 @@
 - Ensure sufficient RAM (recommend 4GB+)
 - Process images sequentially instead of parallel
 
-### 6. Docker Build Issues
+### 7. Docker Build Issues
 **Error:** Build fails with OpenCV dependencies
 
 **Solution:**
@@ -52,7 +90,7 @@
 - Use the provided Dockerfile which includes all required system libs
 - For Apple Silicon Macs, add `--platform=linux/amd64` to build command
 
-### 7. Streamlit App Won't Start
+### 8. Streamlit App Won't Start
 **Error:** Port already in use or connection refused
 
 **Solution:**
@@ -60,7 +98,7 @@
 - Change port: `streamlit run app.py --server.port 8502`
 - Check firewall settings
 
-### 8. Model Prediction Inconsistencies
+### 9. Model Prediction Inconsistencies
 **Issue:** Different results for same image
 
 **Solution:**
